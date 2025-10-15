@@ -1,0 +1,78 @@
+# Operating system files
+Thumbs.db
+.DS_Store
+
+# Visual Studio / Rider settings
+.vs/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+
+# Build output
+bin/
+obj/
+out/
+TestResults/
+artifacts/
+
+# Package outputs
+*.nupkg
+*.snupkg
+*.tgz
+
+# Logs and diagnostics
+*.log
+logs/
+
+# Entity Framework migrations history
+Migrations/
+
+# Coverage reports
+coverage/
+*.coverage
+*.coveragexml
+
+# Environment variables
+.env
+*.env
+.env.*
+.envrc
+
+# Cache directories
+.nuget/
+packages/
+
+# Node / React artifacts
+node_modules/
+.npm/
+yarn.lock
+pnpm-lock.yaml
+package-lock.json
+coverage-final.json
+dist/
+build/
+
+# Tooling caches
+.eslintcache
+.stylelintcache
+.turbo/
+.vitest/
+
+# VS Code local settings
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# Docker
+*.pid
+**/docker-compose.override.yml
+
+# Miscellaneous
+*.swp
+*.swo
+*.orig
