@@ -1,0 +1,73 @@
+.overview {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.overview__stat-grid {
+  gap: 1.25rem;
+}
+
+.overview__stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.overview__stat-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.overview__stat-value {
+  font-size: 2.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.overview__stat-delta {
+  font-size: 0.9rem;
+  color: var(--accent-600);
+}
+
+.overview__panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+}
+
+.overview__panel ul {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.overview__panel li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.overview__panel li div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.overview__panel li strong {
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.overview__panel li span {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.overview__panel time,
+.overview__queue-owner {
+  font-size: 0.85rem;
+  white-space: nowrap;
+  color: var(--text-subtle);
+}

@@ -1,0 +1,104 @@
+{
+  "lastUpdated": "2025-10-16T08:30:00Z",
+  "features": [
+    {
+      "name": "Authentication & API Plumbing",
+      "description": "Scaffolded identity abstractions, JWT issuance, and core auth endpoints (register/login).",
+      "status": "completed",
+      "details": [
+        "Identity service authenticates ASP.NET Identity users",
+        "JWT token service issues access tokens with role/team claims",
+        "AuthController exposes register and login endpoints"
+      ]
+    },
+    {
+      "name": "Refresh Token Support",
+      "description": "Persistent refresh tokens with rotation, secure hashing, and API surface for renewal.",
+      "status": "completed",
+      "details": [
+        "Domain entity and EF configuration for refresh tokens",
+        "Authenticate command stores hashed refresh tokens and returns expiry metadata",
+        "Refresh command validates/rotates tokens via /api/auth/refresh",
+        "EF migration AddRefreshTokens created with scripts/migrate.ps1"
+      ]
+    },
+    {
+      "name": "Brand Survey Module",
+      "description": "Dynamic survey authoring, onboarding questionnaire, and persistence of brand voice profiles.",
+      "status": "in-progress",
+      "details": [
+        "Design survey domain models (survey, questions, answers, categories)",
+        "Expose CRUD APIs for admins to manage surveys",
+        "Capture onboarding responses and map into brand profile value objects",
+        "API endpoints and validators for create/get/submit flows wired to application layer",
+        "List, update, and activation toggle endpoints mapped to new application commands/queries"
+      ]
+    },
+    {
+      "name": "Content Generation Layer",
+      "description": "LLM-driven content creation using brand profiles, moderation, and prompt templating.",
+      "status": "planned",
+      "details": [
+        "Integrate OpenAI provider with retry and logging policies",
+        "Develop prompt template service leveraging brand survey data",
+        "Implement moderation filter prior to approval workflow"
+      ]
+    },
+    {
+      "name": "Approval & Review Workflow",
+      "description": "Role-aware approval chains, audit logging, and team vs individual flows.",
+      "status": "planned",
+      "details": [
+        "Model approval states and audit events",
+        "Build endpoints for submission, approval, rejection",
+        "Auto-approve for individuals; route teams through managers"
+      ]
+    },
+    {
+      "name": "Scheduling & Publishing",
+      "description": "Background worker for scheduling posts and publisher integrations with social platforms.",
+      "status": "planned",
+      "details": [
+        "Extend worker project with Quartz jobs and Redis queue integration",
+        "Integrate platform SDKs/webhooks with retry policies",
+        "Persist schedule metadata and delivery receipts"
+      ]
+    },
+    {
+      "name": "Notification & Audit",
+      "description": "Real-time notifications (SignalR/WebSocket) and comprehensive audit trail.",
+      "status": "planned",
+      "details": [
+        "Design notification dispatch and subscription model",
+        "Emit audit events for user, content, and publishing actions",
+        "Surface activity feed in dashboard"
+      ]
+    },
+    {
+      "name": "React Dashboard",
+      "description": "Vite-powered admin UI for onboarding, content workflow, and analytics primitives.",
+      "status": "planned",
+      "details": [
+        "Scaffold layout, authentication guard, and routing",
+        "Implement brand survey onboarding wizard",
+        "Add content pipeline views (generation → approval → scheduling)"
+      ]
+    },
+    {
+      "name": "Docker & Deployment",
+      "description": "Containerization for API, worker, and frontend with local dev compose setup.",
+      "status": "in-progress",
+      "details": [
+        "Dockerfiles created for API, worker, and dashboard (multi-stage builds)",
+        "docker-compose orchestrates API, worker, dashboard, Postgres, Redis, MinIO, bucket bootstrap",
+        "Root README documents stack usage and secrets to override"
+      ]
+    }
+  ],
+  "nextSteps": [
+    "Apply AddRefreshTokens migration to development database",
+    "Exercise register/login/refresh endpoints end-to-end",
+    "Prioritize upcoming modules (brand survey, content generation, approvals, scheduling)",
+    "Draft implementation plan for React dashboard and Docker support"
+  ]
+}

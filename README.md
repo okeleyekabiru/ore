@@ -71,6 +71,26 @@ npm install
 npm run dev
 ```
 
+### Docker Compose
+
+Run the full stack (API, worker, dashboard, Postgres, Redis, MinIO) with Docker once you have Docker Desktop (or an equivalent runtime) installed.
+
+```powershell
+docker compose up --build
+```
+
+- Dashboard: http://localhost:5173
+- API (Swagger UI when Development): http://localhost:5000/swagger
+- MinIO console: http://localhost:9001 (user: `minioadmin`, password: `minioadmin`)
+
+Update sensitive values such as `Jwt__Key` and `OpenAi__ApiKey` in `docker-compose.yml` before sharing the stack. The compose workflow seeds the `ore-media` bucket on first boot.
+
+Apply EF Core migrations against the running Postgres container when needed:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\migrate.ps1 -Action update -Environment Development -Connection "Host=localhost;Port=5432;Database=ore_dev;Username=postgres;Password=postgres"
+```
+
 ## Migration Tooling
 
 The `scripts` directory provides reusable automation:

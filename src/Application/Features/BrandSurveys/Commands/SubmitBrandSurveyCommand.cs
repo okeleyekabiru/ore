@@ -40,9 +40,33 @@ public sealed class SubmitBrandSurveyCommandHandler : IRequestHandler<SubmitBran
             return Result<Guid>.Failure("Survey not found");
         }
 
+        if (!survey.IsActive)
+        {
+            return Result<Guid>.Failure("Survey is not currently active.");
+        }
+
+        var answers = request.Answers.ToList();
+        var surveyQuestionIds = survey.Questions.Select(q => q.Id).ToHashSet();
+
+        if (answers.Any(answer => !surveyQuestionIds.Contains(answer.QuestionId)))
+        {
+            return Result<Guid>.Failure("One or more answers reference questions that do not belong to this survey.");
+        }
+
+        var duplicateQuestionAnswers = answers
+            .GroupBy(answer => answer.QuestionId)
+            .Where(group => group.Count() > 1)
+            .Select(group => group.Key)
+            .ToArray();
+
+        if (duplicateQuestionAnswers.Length > 0)
+        {
+            return Result<Guid>.Failure("Each survey question can only be answered once.");
+        }
+
         var submission = new BrandSurveySubmission(request.SurveyId, request.UserId);
 
-        foreach (var answer in request.Answers)
+        foreach (var answer in answers)
         {
             submission.AddAnswer(answer.QuestionId, answer.Value, answer.Metadata);
         }

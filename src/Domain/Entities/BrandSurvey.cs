@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Ore.Domain.Common;
 using Ore.Domain.Enums;
 
@@ -41,4 +42,13 @@ public sealed class BrandSurvey : AuditableEntity, IAggregateRoot
 
     public void Deactivate() => IsActive = false;
     public void Activate() => IsActive = true;
+
+    public void RemoveQuestions(IEnumerable<Guid> questionIds)
+    {
+        var ids = questionIds is HashSet<Guid> set
+            ? set
+            : new HashSet<Guid>(questionIds);
+
+        _questions.RemoveAll(question => ids.Contains(question.Id));
+    }
 }

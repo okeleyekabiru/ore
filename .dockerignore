@@ -1,0 +1,12 @@
+**/bin/
+**/obj/
+**/node_modules/
+.git
+.vs
+.vscode
+Dockerfile*
+dist/
+logs/
+.env
+.env.*
+*.user

@@ -1,0 +1,19 @@
+.not-found {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  background: var(--surface-main);
+  border: 1px solid var(--border-subtle);
+}
+
+.not-found h2 {
+  margin: 0;
+}
+
+.not-found p {
+  margin: 0;
+  color: var(--text-muted);
+}

@@ -13,7 +13,13 @@ namespace Ore.Application.Features.BrandSurveys.Queries;
 
 public sealed record SurveyQuestionResponse(Guid Id, string Prompt, SurveyQuestionType Type, int Order, IEnumerable<string> Options);
 
-public sealed record BrandSurveyResponse(Guid Id, string Title, string Description, IEnumerable<SurveyQuestionResponse> Questions);
+public sealed record BrandSurveyResponse(
+    Guid Id,
+    Guid TeamId,
+    string Title,
+    string Description,
+    bool IsActive,
+    IEnumerable<SurveyQuestionResponse> Questions);
 
 public sealed record GetBrandSurveyQuery(Guid SurveyId) : IRequest<Result<BrandSurveyResponse>>;
 
@@ -41,8 +47,10 @@ public sealed class GetBrandSurveyQueryHandler : IRequestHandler<GetBrandSurveyQ
 
         var response = new BrandSurveyResponse(
             survey.Id,
+            survey.TeamId,
             survey.Title,
             survey.Description,
+            survey.IsActive,
             survey.Questions
                 .OrderBy(q => q.Order)
                 .Select(q => new SurveyQuestionResponse(

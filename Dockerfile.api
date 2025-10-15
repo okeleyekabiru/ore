@@ -1,0 +1,21 @@
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+WORKDIR /app
+EXPOSE 8080
+ENV ASPNETCORE_URLS=http://+:8080
+
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+COPY Ore.sln ./
+COPY src/Api/Ore.Api.csproj src/Api/
+COPY src/Application/Ore.Application.csproj src/Application/
+COPY src/Domain/Ore.Domain.csproj src/Domain/
+COPY src/Infrastructure/Ore.Infrastructure.csproj src/Infrastructure/
+COPY src/Worker/Ore.Worker.csproj src/Worker/
+RUN dotnet restore src/Api/Ore.Api.csproj
+COPY . .
+RUN dotnet publish src/Api/Ore.Api.csproj -c Release -o /app/publish /p:UseAppHost=false
+
+FROM base AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+ENTRYPOINT ["dotnet", "Ore.Api.dll"]

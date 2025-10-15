@@ -1,0 +1,97 @@
+.brand-survey {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.brand-survey__actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.brand-survey__loading,
+.brand-survey__error,
+.brand-survey__empty {
+  padding: 1.5rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background-color: var(--surface-raised);
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.brand-survey__error {
+  border-color: var(--danger-500);
+  background-color: var(--danger-100);
+  color: var(--danger-900);
+}
+
+.brand-survey__list {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.brand-survey__card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.brand-survey__card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.brand-survey__card-header h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.35rem;
+}
+
+.brand-survey__card-header p {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.brand-survey__card dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+}
+
+.brand-survey__card dt {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.brand-survey__card dd {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badge--success {
+  background-color: var(--success-100);
+  color: var(--success-700);
+}
+
+.badge--muted {
+  background-color: var(--surface-muted);
+  color: var(--text-subtle);
+}

@@ -1,0 +1,13 @@
+.content-pipeline {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.content-pipeline__placeholder {
+  padding: 2rem;
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--radius-lg);
+  color: var(--text-muted);
+  background: var(--surface-main);
+}

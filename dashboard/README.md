@@ -1,73 +1,54 @@
-# React + TypeScript + Vite
+# Ore Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + Vite front-end for the Ore platform control center. The dashboard surfaces onboarding, content workflow, and analytics data from the .NET API.
 
-Currently, two official plugins are available:
+## Prerequisites
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Node.js 20+
+- Ore API running locally or remotely (see repository root README for backend setup)
 
-## React Compiler
+## Environment configuration
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+1. Copy the sample environment file and set the API base URL:
+   ```powershell
+   cd dashboard
+   Copy-Item .env.example .env
+   ```
+2. Update `VITE_API_BASE_URL` in `.env` to match the API origin (omit the trailing slash). Defaults to `http://localhost:5000` if not provided.
 
-## Expanding the ESLint configuration
+## Authentication tokens
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Protected endpoints (for example `GET /api/brand-surveys`) require a bearer token.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+1. Authenticate against the API: `POST /api/auth/login`.
+2. Persist the tokens in `localStorage` so the dashboard can attach the `Authorization` header:
+   ```js
+   localStorage.setItem('ore:access-token', '<ACCESS_TOKEN>');
+   localStorage.setItem('ore:refresh-token', '<REFRESH_TOKEN>');
+   ```
+3. Refresh the dashboard to retry pending requests.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+The access/refresh storage layer lives at `src/services/authStorage.ts`.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Install & run
+
+```powershell
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open the Vite dev server (default `http://localhost:5173`).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+To run the dashboard alongside the API and infrastructure, use the root-level `docker compose up --build` workflow documented in `../README.md`.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Current views
+
+- **Overview**: Initial metrics cards and milestones placeholders.
+- **Brand Survey**: Calls `GET /api/brand-surveys` and displays survey templates or helpful error messaging when authentication is missing.
+- **Content Pipeline**: Layout stub ready for future API wiring.
+
+## Next steps
+
+1. Build a proper login flow that exchanges credentials for tokens and refreshes access in the background.
+2. Connect remaining modules (content pipeline, scheduling, notifications) once backend endpoints are available.
+3. Add a data-fetching layer (React Query, SWR) with caching and optimistic updates as the API stabilises.
