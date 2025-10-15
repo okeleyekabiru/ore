@@ -27,7 +27,7 @@ public sealed class GetScheduledContentQueryHandler : IRequestHandler<GetSchedul
     public async Task<Result<PagedResult<ScheduledContentDto>>> Handle(GetScheduledContentQuery request, CancellationToken cancellationToken)
     {
         var query = _dbContext.ContentDistributions
-            .Where(d => d.ContentItem.TeamId == request.TeamId)
+            .Where(d => d.ContentItem != null && d.ContentItem.TeamId == request.TeamId)
             .OrderByDescending(d => d.Window.PublishOnUtc)
             .AsNoTracking();
 

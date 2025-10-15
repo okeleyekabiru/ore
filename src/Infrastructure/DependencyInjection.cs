@@ -15,6 +15,8 @@ using Ore.Application.Abstractions.Scheduling;
 using Ore.Application.Abstractions.Storage;
 using Ore.Infrastructure.Identity;
 using Ore.Infrastructure.Persistence;
+using Ore.Infrastructure.Options;
+using Ore.Infrastructure.Services.Auditing;
 using Ore.Infrastructure.Services.Caching;
 using Ore.Infrastructure.Services.Llm;
 using Ore.Infrastructure.Services.Messaging;
@@ -31,9 +33,12 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        var databaseConnection = configuration.GetConnectionString("Database")
+            ?? throw new InvalidOperationException("Database connection string is not configured.");
+
         services.AddDbContext<ApplicationDbContext>(options =>
         {
-            options.UseNpgsql(configuration.GetConnectionString("Database"));
+            options.UseNpgsql(databaseConnection);
         });
 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
@@ -70,26 +75,23 @@ public static class DependencyInjection
         services.AddScoped<ISchedulingService, QuartzSchedulingService>();
         services.AddScoped<IAuditService, AuditService>();
 
-        services.AddQuartz(q =>
-        {
-            q.UseMicrosoftDependencyInjectionJobFactory();
-        });
+        services.AddQuartz();
         services.AddQuartzHostedService(options =>
         {
             options.WaitForJobsToComplete = true;
         });
 
+        var redisConnection = configuration.GetConnectionString("Redis")
+            ?? throw new InvalidOperationException("Redis connection string is not configured.");
+
         services.AddSingleton<IConnectionMultiplexer>(_ =>
-            ConnectionMultiplexer.Connect(configuration.GetConnectionString("Redis")));
+            ConnectionMultiplexer.Connect(redisConnection));
         services.AddSingleton<ICacheService, RedisCacheService>();
 
         services.Configure<OpenAiOptions>(configuration.GetSection(OpenAiOptions.SectionName));
         services.Configure<MinioOptions>(configuration.GetSection(MinioOptions.SectionName));
 
-        services.AddHealthChecks()
-            .AddDbContextCheck<ApplicationDbContext>()
-            .AddNpgSql(configuration.GetConnectionString("Database"))
-            .AddRedis(configuration.GetConnectionString("Redis"));
+        services.AddHealthChecks();
 
         return services;
     }

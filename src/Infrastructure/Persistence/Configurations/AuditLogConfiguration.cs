@@ -10,7 +10,19 @@ internal sealed class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
     {
         builder.HasKey(al => al.Id);
 
-        builder.Property(al => al.EventType)
+        builder.Property(al => al.Actor)
+            .IsRequired()
+            .HasMaxLength(200);
+
+        builder.Property(al => al.Action)
+            .IsRequired()
+            .HasMaxLength(200);
+
+        builder.Property(al => al.Entity)
+            .IsRequired()
+            .HasMaxLength(200);
+
+        builder.Property(al => al.EntityId)
             .IsRequired()
             .HasMaxLength(200);
 
