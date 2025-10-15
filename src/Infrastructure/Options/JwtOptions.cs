@@ -11,6 +11,7 @@ public sealed class JwtOptions
     public string Audience { get; init; } = string.Empty;
     public string Key { get; init; } = string.Empty;
     public int AccessTokenMinutes { get; init; } = 60;
+    public int RefreshTokenDays { get; init; } = 14;
 
     public byte[] GetSigningKeyBytes()
     {

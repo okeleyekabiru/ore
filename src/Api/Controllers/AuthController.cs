@@ -27,8 +27,8 @@ public sealed class AuthController : ApiControllerBase
             request.TeamName,
             request.IsIndividual);
 
-    var result = await Mediator.Send(command, cancellationToken);
-    return FromResult(result, "User registered successfully.");
+        var result = await Mediator.Send(command, cancellationToken);
+        return FromResult(result, "User registered successfully.");
     }
 
     [HttpPost("login")]
@@ -36,5 +36,12 @@ public sealed class AuthController : ApiControllerBase
     {
         var result = await Mediator.Send(new AuthenticateUserCommand(request.Email, request.Password), cancellationToken);
         return FromResult(result, "Authentication successful.");
+    }
+
+    [HttpPost("refresh")]
+    public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest request, CancellationToken cancellationToken)
+    {
+        var result = await Mediator.Send(new RefreshAccessTokenCommand(request.RefreshToken), cancellationToken);
+        return FromResult(result, "Token refreshed successfully.");
     }
 }

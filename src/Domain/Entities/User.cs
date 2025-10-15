@@ -8,6 +8,7 @@ public sealed class User : AuditableEntity, IAggregateRoot
 {
     private readonly List<ContentItem> _authoredContent = new();
     private readonly List<ApprovalRecord> _approvals = new();
+    private readonly List<RefreshToken> _refreshTokens = new();
 
     private User()
     {
@@ -33,6 +34,7 @@ public sealed class User : AuditableEntity, IAggregateRoot
 
     public IReadOnlyCollection<ContentItem> AuthoredContent => _authoredContent;
     public IReadOnlyCollection<ApprovalRecord> Approvals => _approvals;
+    public IReadOnlyCollection<RefreshToken> RefreshTokens => _refreshTokens.AsReadOnly();
 
     public string FullName => string.Join(' ', new[] { FirstName, LastName }.Where(x => !string.IsNullOrWhiteSpace(x)));
 

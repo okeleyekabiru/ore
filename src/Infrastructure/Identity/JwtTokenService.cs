@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -17,7 +18,7 @@ public sealed class JwtTokenService : IJwtTokenService
         _options = options.Value;
     }
 
-    public string GenerateToken(Guid userId, string email, string fullName, IEnumerable<string> roles, Guid? teamId = null)
+    public JwtTokenResult GenerateAccessToken(Guid userId, string email, string fullName, IEnumerable<string> roles, Guid? teamId = null)
     {
         var signingKey = new SymmetricSecurityKey(_options.GetSigningKeyBytes());
         var credentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256);
@@ -51,6 +52,17 @@ public sealed class JwtTokenService : IJwtTokenService
             expires: expires,
             signingCredentials: credentials);
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        var jwt = new JwtSecurityTokenHandler().WriteToken(token);
+
+        return new JwtTokenResult(jwt, expires);
+    }
+
+    public RefreshTokenResult GenerateRefreshToken()
+    {
+        var randomBytes = RandomNumberGenerator.GetBytes(64);
+        var token = Convert.ToBase64String(randomBytes);
+        var expires = DateTime.UtcNow.AddDays(_options.RefreshTokenDays <= 0 ? 14 : _options.RefreshTokenDays);
+
+        return new RefreshTokenResult(token, expires);
     }
 }

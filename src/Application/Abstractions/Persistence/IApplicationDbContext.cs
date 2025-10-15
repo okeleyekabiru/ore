@@ -20,6 +20,7 @@ public interface IApplicationDbContext
     DbSet<ContentGenerationRequest> ContentGenerationRequests { get; }
     DbSet<Notification> Notifications { get; }
     DbSet<AuditLog> AuditLogs { get; }
+    DbSet<RefreshToken> RefreshTokens { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

@@ -89,4 +89,16 @@ public sealed class IdentityService : IIdentityService
         var roles = await _userManager.GetRolesAsync(user);
         return new AuthenticationResult(user.Id, user.Email ?? string.Empty, roles.ToArray());
     }
+
+    public async Task<IReadOnlyCollection<string>> GetRolesAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        if (user is null)
+        {
+            return Array.Empty<string>();
+        }
+
+        var roles = await _userManager.GetRolesAsync(user);
+        return roles.ToArray();
+    }
 }
