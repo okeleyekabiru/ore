@@ -14,7 +14,7 @@
 	Otherwise, create the project structure manually using available file creation tools.
 	-->
 
-- [ ] Customize the Project
+- [x] Customize the Project — Backend domain/application/infrastructure layers implemented, configs updated, migration tooling added.
 	<!--
 	Verify that all previous steps have been completed successfully and you have marked the step as completed.
 	Develop a plan to modify codebase according to user requirements.
@@ -22,10 +22,10 @@
 	Skip this step for "Hello World" projects.
 	-->
 
-- [ ] Install Required Extensions
+- [x] Install Required Extensions — None requested; no action needed.
 	<!-- ONLY install extensions provided mentioned in the get_project_setup_info. Skip this step otherwise and mark as completed. -->
 
-- [ ] Compile the Project
+- [x] Compile the Project — `dotnet build Ore.sln` succeeds after resolving infrastructure services and migrations.
 	<!--
 	Verify that all previous steps have been completed.
 	Install any missing dependencies.

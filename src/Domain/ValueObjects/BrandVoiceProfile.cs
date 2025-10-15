@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Ore.Domain.Common;
 
@@ -5,10 +7,14 @@ namespace Ore.Domain.ValueObjects;
 
 public sealed class BrandVoiceProfile : ValueObject
 {
-    public string Voice { get; }
-    public string Tone { get; }
-    public string Audience { get; }
-    public IReadOnlyCollection<string> Keywords { get; }
+    public string Voice { get; private set; } = string.Empty;
+    public string Tone { get; private set; } = string.Empty;
+    public string Audience { get; private set; } = string.Empty;
+    public IReadOnlyCollection<string> Keywords { get; private set; } = Array.Empty<string>();
+
+    private BrandVoiceProfile()
+    {
+    }
 
     private BrandVoiceProfile(string voice, string tone, string audience, IEnumerable<string> keywords)
     {

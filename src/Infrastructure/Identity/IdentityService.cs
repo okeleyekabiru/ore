@@ -71,4 +71,22 @@ public sealed class IdentityService : IIdentityService
 
         return await _userManager.IsInRoleAsync(user, role);
     }
+
+    public async Task<AuthenticationResult?> AuthenticateAsync(string email, string password, CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+        if (user is null)
+        {
+            return null;
+        }
+
+        var passwordValid = await _userManager.CheckPasswordAsync(user, password);
+        if (!passwordValid)
+        {
+            return null;
+        }
+
+        var roles = await _userManager.GetRolesAsync(user);
+        return new AuthenticationResult(user.Id, user.Email ?? string.Empty, roles.ToArray());
+    }
 }

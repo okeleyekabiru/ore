@@ -27,9 +27,6 @@ artifacts/
 *.log
 logs/
 
-# Entity Framework migrations history
-Migrations/
-
 # Coverage reports
 coverage/
 *.coverage
