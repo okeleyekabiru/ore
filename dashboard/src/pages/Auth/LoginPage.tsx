@@ -93,8 +93,11 @@ const LoginPage = () => {
 
         <footer className="login-card__footer">
           <p>
-            Need an account? Use the API endpoint <code>POST /api/auth/register</code> to create one, then return here to
-            sign in.
+            Need an account?{' '}
+            <Link to="/auth/register" className="login-card__link">
+              Create one now
+            </Link>
+            .
           </p>
           <Link to="/" className="login-card__back-link">
             Back to dashboard overview

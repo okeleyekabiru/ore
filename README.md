@@ -83,12 +83,20 @@ docker compose up --build
 - API (Swagger UI when Development): http://localhost:5000/swagger
 - MinIO console: http://localhost:9001 (user: `minioadmin`, password: `minioadmin`)
 
-Update sensitive values such as `Jwt__Key` and `OpenAi__ApiKey` in `docker-compose.yml` before sharing the stack. The compose workflow seeds the `ore-media` bucket on first boot.
+Update sensitive values such as `Jwt__Key` and `OpenAi__ApiKey` in `docker-compose.yml` before sharing the stack. The compose workflow seeds the `ore-media` bucket on first boot and runs an `api-migrator` job that applies EF Core migrations before the API and worker start.
 
-Apply EF Core migrations against the running Postgres container when needed:
+#### Debugging the stack
+
+- Check health: `docker compose ps` to see which services are running or exited.
+- Inspect output: `docker compose logs api --tail 200 -f` (swap `api` for `api-migrator`, `postgres`, etc.).
+- Rerun migrations: `docker compose up api-migrator` after fixing schema issues.
+- Query the database: `docker compose exec postgres psql -U postgres -d ore_dev` then `\dt` or SQL statements.
+- Run EF commands inside the container: `docker compose exec api dotnet ef database info --project src/Infrastructure/Ore.Infrastructure.csproj --startup-project src/Api/Ore.Api.csproj`.
+
+Apply EF Core migrations against the running Postgres container from your host when needed:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\migrate.ps1 -Action update -Environment Development -Connection "Host=localhost;Port=5432;Database=ore_dev;Username=postgres;Password=postgres"
+powershell -ExecutionPolicy Bypass -File .\scripts\migrate.ps1 -Action update -Environment Development -DatabaseConnection "Host=localhost;Port=5432;Database=ore_dev;Username=postgres;Password=postgres" -RedisConnection "localhost:6379"
 ```
 
 ## Migration Tooling

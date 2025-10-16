@@ -51,7 +51,7 @@ public sealed class IdentityService : IIdentityService
 
     public async Task AssignToTeamAsync(Guid userId, Guid teamId, CancellationToken cancellationToken = default)
     {
-        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user is null)
         {
             throw new InvalidOperationException("User not found");
@@ -63,7 +63,7 @@ public sealed class IdentityService : IIdentityService
 
     public async Task<bool> IsInRoleAsync(Guid userId, string role, CancellationToken cancellationToken = default)
     {
-        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        var user = await _userManager.FindByIdAsync(userId.ToString());
         if (user is null)
         {
             return false;
@@ -74,7 +74,7 @@ public sealed class IdentityService : IIdentityService
 
     public async Task<AuthenticationResult?> AuthenticateAsync(string email, string password, CancellationToken cancellationToken = default)
     {
-        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+        var user = await _userManager.FindByEmailAsync(email);
         if (user is null)
         {
             return null;

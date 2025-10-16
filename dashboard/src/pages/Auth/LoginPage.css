@@ -96,3 +96,13 @@
 .login-card__back-link:hover {
   text-decoration: underline;
 }
+
+.login-card__link {
+  color: var(--accent-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.login-card__link:hover {
+  text-decoration: underline;
+}

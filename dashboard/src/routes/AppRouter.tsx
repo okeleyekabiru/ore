@@ -6,11 +6,16 @@ import ContentPipelinePage from '../pages/ContentPipeline/ContentPipelinePage';
 import NotFoundPage from '../pages/NotFound/NotFoundPage';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
 import LoginPage from '../pages/Auth/LoginPage';
+import SignUpPage from '../pages/Auth/SignUpPage';
 
 export const appRouter = createBrowserRouter([
   {
     path: '/auth/login',
     element: <LoginPage />,
+  },
+  {
+    path: '/auth/register',
+    element: <SignUpPage />,
   },
   {
     element: <ProtectedRoute />,

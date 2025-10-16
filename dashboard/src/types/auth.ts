@@ -1,3 +1,13 @@
+export const ROLE_TYPES = {
+  Admin: 1,
+  SocialMediaManager: 2,
+  ContentCreator: 3,
+  Approver: 4,
+  Individual: 5,
+} as const;
+
+export type RoleType = (typeof ROLE_TYPES)[keyof typeof ROLE_TYPES];
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -38,4 +48,14 @@ export interface UserProfile {
   role: number;
   teamId: string | null;
   teamName?: string | null;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role: RoleType;
+  teamName?: string | null;
+  isIndividual: boolean;
 }

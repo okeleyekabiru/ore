@@ -82,7 +82,8 @@
         "Scaffold layout, authentication guard, and routing",
         "Login screen exchanges credentials, stores tokens, auto-refreshes, and hydrates user profile",
         "Brand survey page lists templates via API and handles auth errors",
-        "Content pipeline view stub ready for API integration"
+    "Content pipeline view stub ready for API integration",
+    "Signup page collects registration details and links back to login"
       ]
     },
     {
@@ -92,12 +93,13 @@
       "details": [
         "Dockerfiles created for API, worker, and dashboard (multi-stage builds)",
         "docker-compose orchestrates API, worker, dashboard, Postgres, Redis, MinIO, bucket bootstrap",
-        "Root README documents stack usage and secrets to override"
+        "Root README documents stack usage, debugging commands, and secrets to override",
+        "docker compose now runs an api-migrator job that applies EF Core migrations before services boot"
       ]
     }
   ],
   "nextSteps": [
-    "Apply AddRefreshTokens migration to development database",
+      "Run docker compose up so api-migrator applies the AddRefreshTokens migration to the development database",
     "Verify dashboard login and automatic token refresh against live API",
     "Prioritize wiring content pipeline and scheduling UI once backend endpoints land",
     "Draft deployment automation for Docker images"
