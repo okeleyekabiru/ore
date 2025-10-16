@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2025-10-16T08:30:00Z",
+  "lastUpdated": "2025-10-16T12:15:00Z",
   "features": [
     {
       "name": "Authentication & API Plumbing",
@@ -77,11 +77,12 @@
     {
       "name": "React Dashboard",
       "description": "Vite-powered admin UI for onboarding, content workflow, and analytics primitives.",
-      "status": "planned",
+      "status": "in-progress",
       "details": [
         "Scaffold layout, authentication guard, and routing",
-        "Implement brand survey onboarding wizard",
-        "Add content pipeline views (generation → approval → scheduling)"
+        "Login screen exchanges credentials, stores tokens, auto-refreshes, and hydrates user profile",
+        "Brand survey page lists templates via API and handles auth errors",
+        "Content pipeline view stub ready for API integration"
       ]
     },
     {
@@ -97,8 +98,8 @@
   ],
   "nextSteps": [
     "Apply AddRefreshTokens migration to development database",
-    "Exercise register/login/refresh endpoints end-to-end",
-    "Prioritize upcoming modules (brand survey, content generation, approvals, scheduling)",
-    "Draft implementation plan for React dashboard and Docker support"
+    "Verify dashboard login and automatic token refresh against live API",
+    "Prioritize wiring content pipeline and scheduling UI once backend endpoints land",
+    "Draft deployment automation for Docker images"
   ]
 }

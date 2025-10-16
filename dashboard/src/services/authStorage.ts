@@ -29,6 +29,8 @@ export const authStorage = {
     storage.setItem(ACCESS_TOKEN_KEY, accessToken);
     if (refreshToken) {
       storage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+    } else {
+      storage.removeItem(REFRESH_TOKEN_KEY);
     }
   },
   clear() {

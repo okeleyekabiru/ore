@@ -16,19 +16,12 @@ React + Vite front-end for the Ore platform control center. The dashboard surfac
    ```
 2. Update `VITE_API_BASE_URL` in `.env` to match the API origin (omit the trailing slash). Defaults to `http://localhost:5000` if not provided.
 
-## Authentication tokens
+## Authentication
 
-Protected endpoints (for example `GET /api/brand-surveys`) require a bearer token.
+Use the login screen at `/auth/login` to exchange credentials for access and refresh tokens. After a successful sign-in the tokens are stored in `localStorage` via `src/services/authStorage.ts`, refreshed automatically before expiry, and user details are rehydrated on page reload so protected routes (such as the brand survey list) stay accessible.
 
-1. Authenticate against the API: `POST /api/auth/login`.
-2. Persist the tokens in `localStorage` so the dashboard can attach the `Authorization` header:
-   ```js
-   localStorage.setItem('ore:access-token', '<ACCESS_TOKEN>');
-   localStorage.setItem('ore:refresh-token', '<REFRESH_TOKEN>');
-   ```
-3. Refresh the dashboard to retry pending requests.
-
-The access/refresh storage layer lives at `src/services/authStorage.ts`.
+- Create accounts via the API endpoint `POST /api/auth/register` (or seed users in the backend).
+- Existing tokens can be cleared with the **Sign out** action in the dashboard header.
 
 ## Install & run
 
@@ -49,6 +42,6 @@ To run the dashboard alongside the API and infrastructure, use the root-level `d
 
 ## Next steps
 
-1. Build a proper login flow that exchanges credentials for tokens and refreshes access in the background.
-2. Connect remaining modules (content pipeline, scheduling, notifications) once backend endpoints are available.
-3. Add a data-fetching layer (React Query, SWR) with caching and optimistic updates as the API stabilises.
+1. Connect remaining modules (content pipeline, scheduling, notifications) once backend endpoints are available.
+2. Add a data-fetching layer (React Query, SWR) with caching and optimistic updates as the API stabilises.
+3. Implement automatic refresh token rotation on navigation errors (retry after 401) and surface session expiry warnings when refresh fails.

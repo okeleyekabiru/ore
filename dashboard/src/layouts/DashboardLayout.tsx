@@ -1,4 +1,5 @@
-import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import './DashboardLayout.css';
 
 const navItems = [
@@ -27,7 +28,34 @@ const locationHints: Record<string, string> = {
 
 const DashboardLayout = () => {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const hint = locationHints[pathname] ?? 'Navigate using the sidebar to explore modules.';
+
+  const deriveInitials = (fullName?: string, fallback?: string) => {
+    if (fullName) {
+      const parts = fullName.trim().split(/\s+/);
+      const first = parts[0]?.[0];
+      const last = parts.length > 1 ? parts[parts.length - 1]?.[0] : undefined;
+      const initials = `${first ?? ''}${last ?? ''}`.toUpperCase();
+      if (initials) {
+        return initials;
+      }
+    }
+
+    if (fallback) {
+      return fallback.slice(0, 2).toUpperCase();
+    }
+
+    return 'OR';
+  };
+
+  const avatarLabel = deriveInitials(user?.fullName, user?.email);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/auth/login', { replace: true });
+  };
 
   return (
     <div className="dashboard">
@@ -63,11 +91,14 @@ const DashboardLayout = () => {
             <p>{hint}</p>
           </div>
           <div className="dashboard__topbar-user" aria-label="Current user">
-            <span className="dashboard__avatar">AK</span>
+            <span className="dashboard__avatar">{avatarLabel}</span>
             <div>
-              <span className="dashboard__user-name">Alex Kim</span>
-              <span className="dashboard__user-role">Marketing Lead</span>
+              <span className="dashboard__user-name">{user?.fullName ?? 'Signed in'}</span>
+              <span className="dashboard__user-role">{user?.email ?? 'Authenticated access'}</span>
             </div>
+            <button type="button" onClick={handleLogout} className="dashboard__logout button button--secondary">
+              Sign out
+            </button>
           </div>
         </header>
 
