@@ -13,11 +13,12 @@ public class Worker : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            if (_logger.IsEnabled(LogLevel.Information))
+            if (_logger.IsEnabled(LogLevel.Debug))
             {
-                _logger.LogInformation("Worker running at: {time}", DateTimeOffset.Now);
+                _logger.LogDebug("Worker heartbeat at {Time}", DateTimeOffset.Now);
             }
-            await Task.Delay(1000, stoppingToken);
+
+            await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
         }
     }
 }
