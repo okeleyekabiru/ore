@@ -1,0 +1,25 @@
+{
+  "teamId": "",
+  "title": "Imported survey template",
+  "description": "Customize this copy and upload it through the dashboard import flow.",
+  "questions": [
+    {
+      "prompt": "Who is your core audience?",
+      "type": "TextArea",
+      "order": 1,
+      "options": []
+    },
+    {
+      "prompt": "Select the tones that fit your brand.",
+      "type": "MultiChoice",
+      "order": 2,
+      "options": ["Friendly", "Playful", "Professional"]
+    },
+    {
+      "prompt": "Preferred publishing cadence",
+      "type": "Scale",
+      "order": 3,
+      "options": []
+    }
+  ]
+}

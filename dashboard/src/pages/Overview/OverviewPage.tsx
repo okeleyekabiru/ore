@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import PageHeader from '../../components/common/PageHeader';
 import './OverviewPage.css';
 
@@ -51,6 +52,8 @@ const queueItems = [
 ];
 
 const OverviewPage = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="overview">
       <PageHeader
@@ -58,7 +61,7 @@ const OverviewPage = () => {
         title="Team pulse & pipeline health"
         description="High-level telemetry across onboarding, generation, and publishing so you can unblock work before deadlines slip."
         actions={
-          <button type="button" className="button button--primary">
+          <button type="button" className="button button--primary" onClick={() => navigate('/content/pipeline')}>
             New content request
           </button>
         }

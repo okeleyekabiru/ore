@@ -1,3 +1,13 @@
+export const SurveyQuestionType = {
+  Text: 1,
+  TextArea: 2,
+  SingleChoice: 3,
+  MultiChoice: 4,
+  Scale: 5,
+} as const;
+
+export type SurveyQuestionType = (typeof SurveyQuestionType)[keyof typeof SurveyQuestionType];
+
 export interface BrandSurveySummary {
   id: string;
   teamId: string;
@@ -24,4 +34,18 @@ export interface BrandSurveyDetails {
   description: string;
   isActive: boolean;
   questions: BrandSurveyQuestionDetails[];
+}
+
+export interface CreateSurveyQuestionPayload {
+  prompt: string;
+  type: SurveyQuestionType;
+  order: number;
+  options: string[];
+}
+
+export interface CreateBrandSurveyPayload {
+  teamId: string;
+  title: string;
+  description: string;
+  questions: CreateSurveyQuestionPayload[];
 }

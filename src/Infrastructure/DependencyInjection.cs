@@ -41,6 +41,8 @@ public static class DependencyInjection
             options.UseNpgsql(databaseConnection);
         });
 
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
         services.AddIdentityCore<ApplicationUser>(options =>

@@ -2,6 +2,8 @@ import { createBrowserRouter } from 'react-router-dom';
 import DashboardLayout from '../layouts/DashboardLayout';
 import OverviewPage from '../pages/Overview/OverviewPage';
 import BrandSurveyWizardPage from '../pages/BrandSurvey/BrandSurveyWizardPage';
+import BrandSurveyCreatePage from '../pages/BrandSurvey/BrandSurveyCreatePage';
+import BrandSurveyImportPage from '../pages/BrandSurvey/BrandSurveyImportPage';
 import ContentPipelinePage from '../pages/ContentPipeline/ContentPipelinePage';
 import NotFoundPage from '../pages/NotFound/NotFoundPage';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
@@ -32,6 +34,14 @@ export const appRouter = createBrowserRouter([
           {
             path: 'onboarding/brand-survey',
             element: <BrandSurveyWizardPage />,
+          },
+          {
+            path: 'onboarding/brand-survey/create',
+            element: <BrandSurveyCreatePage />,
+          },
+          {
+            path: 'onboarding/brand-survey/import',
+            element: <BrandSurveyImportPage />,
           },
           {
             path: 'content/pipeline',

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PageHeader from '../../components/common/PageHeader';
 import { ApiError } from '../../types/api';
 import { listBrandSurveys } from '../../services/brandSurveyService';
@@ -8,6 +9,7 @@ import './BrandSurveyWizardPage.css';
 type LoadState = 'idle' | 'loading' | 'success' | 'error';
 
 const BrandSurveyWizardPage = () => {
+  const navigate = useNavigate();
   const [surveys, setSurveys] = useState<BrandSurveySummary[]>([]);
   const [state, setState] = useState<LoadState>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -112,10 +114,18 @@ const BrandSurveyWizardPage = () => {
         description="Fetches the latest surveys from the API so you can track onboarding coverage and jump into the wizard."
         actions={
           <div className="brand-survey__actions">
-            <button type="button" className="button button--secondary">
+            <button
+              type="button"
+              className="button button--secondary"
+              onClick={() => navigate('/onboarding/brand-survey/import')}
+            >
               Import template
             </button>
-            <button type="button" className="button button--primary">
+            <button
+              type="button"
+              className="button button--primary"
+              onClick={() => navigate('/onboarding/brand-survey/create')}
+            >
               Create survey
             </button>
           </div>

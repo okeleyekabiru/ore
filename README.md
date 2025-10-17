@@ -22,9 +22,9 @@ The Stratus update evolves Ore into a production-ready, AI-assisted social media
 - [x] Infrastructure services (Identity, EF Core, Redis, Quartz, MinIO, OpenAI)
 - [x] Design-time DbContext factory and initial migration (`InitialCreate`)
 - [x] Environment-aware migration scripts + GitHub Actions workflow
-- [ ] API endpoints (REST + auth wiring)
+- [x] API endpoints (Auth, team-scoped Brand Survey CRUD, onboarding submission)
 - [ ] Background worker orchestration & Quartz jobs
-- [ ] React dashboard feature build-out
+- [ ] React dashboard feature build-out (Brand Survey flows live; Content pipeline board ready for API wiring)
 - [ ] Docker compose & deployment automation
 - [ ] Comprehensive tests & CI quality gates
 
@@ -70,6 +70,14 @@ cd dashboard
 npm install
 npm run dev
 ```
+
+Brand Survey administrators can seed new templates through the dashboard:
+
+1. Sign in with an admin account and open the Brand Survey area from the overview quick actions.
+2. Use **Create Survey** to author a new template or **Import Survey** to upload JSON.
+3. Download the sample import payload at `dashboard/public/samples/brand-survey-template.json` for structure guidance.
+
+The Content Pipeline board consumes upcoming workflow endpoints. Until those APIs ship, the dashboard uses sample data while exercising filters, status transitions, and summary counts.
 
 ### Docker Compose
 
@@ -120,10 +128,10 @@ scripts\migrate-staging.bat update InitialCreate "Host=staging-db;Port=5432;Data
 
 ## Next Steps
 
-1. Implement authenticated REST endpoints in the API (users, surveys, content lifecycle).
+1. Verify dashboard login refresh flow against the live API and expand integration tests.
 2. Orchestrate background jobs in the worker for content publishing & notifications.
-3. Build dashboard pages for admin workflows (survey builder, content approvals, scheduling).
-4. Add Docker compose and deployment pipeline wiring.
-5. Expand automated test coverage and quality gates.
+3. Build dashboard pages for the content pipeline, scheduling, and analytics.
+4. Finalize Docker compose and deployment pipeline automation.
+5. Expand automated test coverage and CI quality gates.
 
 Track progress by updating the checklist above as milestones are completed.

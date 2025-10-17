@@ -82,8 +82,11 @@
         "Scaffold layout, authentication guard, and routing",
         "Login screen exchanges credentials, stores tokens, auto-refreshes, and hydrates user profile",
         "Brand survey page lists templates via API and handles auth errors",
-    "Content pipeline view stub ready for API integration",
-    "Signup page collects registration details and links back to login"
+        "Brand survey creation form validates inputs and posts to API",
+        "JSON template importer maps survey questions, provisions via API, and links a sample download",
+  "Content pipeline board loads pipeline summary/items with graceful fallback and supports inline status transitions",
+        "Overview quick action navigates to the pipeline module",
+        "Signup page collects registration details and links back to login"
       ]
     },
     {
@@ -99,7 +102,6 @@
     }
   ],
   "nextSteps": [
-      "Run docker compose up so api-migrator applies the AddRefreshTokens migration to the development database",
     "Verify dashboard login and automatic token refresh against live API",
     "Prioritize wiring content pipeline and scheduling UI once backend endpoints land",
     "Draft deployment automation for Docker images"

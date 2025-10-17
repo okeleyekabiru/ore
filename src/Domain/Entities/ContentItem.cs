@@ -62,8 +62,22 @@ public sealed class ContentItem : AuditableEntity, IAggregateRoot
         }
     }
 
-    public void MarkGenerated() => Status = ContentStatus.Generated;
-    public void SubmitForApproval() => Status = ContentStatus.PendingApproval;
+    public void ResetToDraft()
+    {
+        Status = ContentStatus.Draft;
+        CurrentApprovalId = null;
+    }
+
+    public void MarkGenerated()
+    {
+        Status = ContentStatus.Generated;
+        CurrentApprovalId = null;
+    }
+    public void SubmitForApproval()
+    {
+        CurrentApprovalId = null;
+        Status = ContentStatus.PendingApproval;
+    }
     public void Approve(Guid approvalId)
     {
         CurrentApprovalId = approvalId;

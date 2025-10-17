@@ -1,6 +1,10 @@
 import { httpClient } from './httpClient';
 import type { ApiSuccess } from '../types/api';
-import type { BrandSurveySummary, BrandSurveyDetails } from '../types/brandSurvey';
+import type {
+  BrandSurveySummary,
+  BrandSurveyDetails,
+  CreateBrandSurveyPayload,
+} from '../types/brandSurvey';
 
 interface ListBrandSurveysOptions {
   includeInactive?: boolean;
@@ -31,6 +35,15 @@ export const getBrandSurvey = (
   options?: { signal?: AbortSignal },
 ): Promise<ApiSuccess<BrandSurveyDetails>> => {
   return httpClient.get<BrandSurveyDetails>(`/api/brand-surveys/${surveyId}`, {
+    signal: options?.signal,
+  });
+};
+
+export const createBrandSurvey = (
+  payload: CreateBrandSurveyPayload,
+  options?: { signal?: AbortSignal },
+): Promise<ApiSuccess<string>> => {
+  return httpClient.post<string>('/api/brand-surveys', payload, {
     signal: options?.signal,
   });
 };
