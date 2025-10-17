@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Ore.Domain.Entities;
 
@@ -16,6 +18,17 @@ internal sealed class TeamConfiguration : IEntityTypeConfiguration<Team>
             .IsRequired()
             .HasMaxLength(200);
 
+        var keywordsComparer = new ValueComparer<IReadOnlyCollection<string>>(
+            (left, right) =>
+                ReferenceEquals(left, right)
+                || (left != null
+                    && right != null
+                    && left.SequenceEqual(right, StringComparer.OrdinalIgnoreCase)),
+            collection => collection == null
+                ? 0
+                : collection.Aggregate(0, (hash, value) => HashCode.Combine(hash, StringComparer.OrdinalIgnoreCase.GetHashCode(value ?? string.Empty))),
+            collection => collection == null ? Array.Empty<string>() : collection.ToArray());
+
         builder.OwnsOne(t => t.BrandVoice, ownedBuilder =>
         {
             ownedBuilder.Property(bv => bv.Voice).HasMaxLength(200);
@@ -28,7 +41,8 @@ internal sealed class TeamConfiguration : IEntityTypeConfiguration<Team>
                         ? Array.Empty<string>()
                         : v.Split(',', StringSplitOptions.RemoveEmptyEntries)
                             .Select(s => s.Trim())
-                            .ToArray());
+                            .ToArray())
+                .Metadata.SetValueComparer(keywordsComparer);
         });
 
         builder.Navigation(t => t.Members).UsePropertyAccessMode(PropertyAccessMode.Field);

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { FormEvent } from 'react';
 import PageHeader from '../../components/common/PageHeader';
 import { useAuth } from '../../contexts/AuthContext';
 import { contentPipelineService } from '../../services/contentPipelineService';
@@ -27,6 +28,17 @@ const BOARD_COLUMNS = [
     title: 'Scheduled',
     blurb: 'Queued and ready for distribution',
   },
+] as const;
+
+const CHANNEL_OPTIONS = [
+  { value: 'unassigned', label: 'Unassigned' },
+  { value: 'linkedin', label: 'LinkedIn' },
+  { value: 'instagram', label: 'Instagram' },
+  { value: 'meta', label: 'Meta' },
+  { value: 'x', label: 'X (Twitter)' },
+  { value: 'tiktok', label: 'TikTok' },
+  { value: 'email', label: 'Email' },
+  { value: 'blog', label: 'Blog' },
 ] as const;
 
 type BoardColumnKey = (typeof BOARD_COLUMNS)[number]['key'];
@@ -142,6 +154,16 @@ const ContentPipelinePage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>('Content pipeline API not available yet. Showing sample data.');
   const [transitioningId, setTransitioningId] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [isComposerOpen, setIsComposerOpen] = useState(false);
+  const [composerStatus, setComposerStatus] = useState<ContentPipelineStatus | null>(null);
+  const [composerTitle, setComposerTitle] = useState('');
+  const [composerChannel, setComposerChannel] = useState<string>(CHANNEL_OPTIONS[0].value);
+  const [composerDueDate, setComposerDueDate] = useState('');
+  const [composerError, setComposerError] = useState<string | null>(null);
+  const [isComposerSaving, setIsComposerSaving] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const chipClass = (isActive: boolean) =>
     isActive ? 'content-pipeline__chip content-pipeline__chip--active' : 'content-pipeline__chip';
@@ -163,14 +185,20 @@ const ContentPipelinePage = () => {
     return counts;
   }, [boardItems, summary]);
 
+  useEffect(() => {
+    const handle = window.setTimeout(() => setDebouncedSearch(searchTerm.trim()), 350);
+    return () => window.clearTimeout(handle);
+  }, [searchTerm]);
+
   const fetchPipeline = useCallback(
-    async (activeFilter: FilterKey, abortSignal: AbortSignal) => {
+    async (activeFilter: FilterKey, search: string, abortSignal: AbortSignal) => {
       if (!user) {
         return;
       }
 
       setIsLoading(true);
       setError(null);
+      setSuccessMessage(null);
 
       try {
         const requestBase: ContentPipelinePageRequest = {
@@ -179,7 +207,7 @@ const ContentPipelinePage = () => {
           teamId: user.teamId ?? undefined,
         };
 
-        const itemsRequest: ContentPipelinePageRequest = { ...requestBase };
+  const itemsRequest: ContentPipelinePageRequest = { ...requestBase };
 
         if (activeFilter === 'mine' && user.userId) {
           itemsRequest.ownerId = user.userId;
@@ -187,6 +215,10 @@ const ContentPipelinePage = () => {
 
         if (activeFilter === 'scheduled') {
           itemsRequest.status = ContentPipelineStatus.Scheduled;
+        }
+
+        if (search) {
+          itemsRequest.search = search;
         }
 
         const [summaryResponse, itemsResponse] = await Promise.all([
@@ -225,13 +257,105 @@ const ContentPipelinePage = () => {
   useEffect(() => {
     const controller = new AbortController();
     if (user) {
-      void fetchPipeline(selectedFilter, controller.signal);
+      void fetchPipeline(selectedFilter, debouncedSearch, controller.signal);
     }
 
     return () => {
       controller.abort();
     };
-  }, [fetchPipeline, selectedFilter, user]);
+  }, [debouncedSearch, fetchPipeline, selectedFilter, user]);
+
+  const openComposer = useCallback((status: ContentPipelineStatus) => {
+    setComposerStatus(status);
+    setComposerTitle('');
+    setComposerChannel(CHANNEL_OPTIONS[0].value);
+    setComposerDueDate('');
+    setComposerError(null);
+    setIsComposerSaving(false);
+    setIsComposerOpen(true);
+  }, []);
+
+  const closeComposer = useCallback(() => {
+    if (isComposerSaving) {
+      return;
+    }
+
+    setIsComposerOpen(false);
+    setComposerError(null);
+    setIsComposerSaving(false);
+  }, [isComposerSaving]);
+
+  const handleComposerSubmit = useCallback(
+    async (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+
+      if (!composerStatus) {
+        return;
+      }
+
+      const trimmedTitle = composerTitle.trim();
+      if (!trimmedTitle) {
+        setComposerError('Please add a working title before saving.');
+        return;
+      }
+
+      const dueIso = composerDueDate ? new Date(composerDueDate).toISOString() : null;
+      setComposerError(null);
+      setIsComposerSaving(true);
+
+      try {
+        const created = await contentPipelineService.createItem({
+          title: trimmedTitle,
+          status: composerStatus,
+          channel: composerChannel,
+          dueOnUtc: dueIso,
+          teamId: user?.teamId ?? null,
+        });
+
+        setBoardItems((prev) => {
+          const next: BoardState = { ...prev };
+          const statusKey = created.status;
+          const existing = next[statusKey] ?? [];
+          next[statusKey] = [...existing, created];
+          return next;
+        });
+
+        setSummary((prev) => {
+          if (!prev) {
+            return prev;
+          }
+
+          const index = prev.findIndex((entry) => entry.status === created.status);
+          if (index >= 0) {
+            const next = [...prev];
+            next[index] = { ...next[index], count: next[index].count + 1 };
+            return next;
+          }
+
+          return [...prev, { status: created.status, count: 1 }];
+        });
+
+        setComposerError(null);
+        setError(null);
+        setSuccessMessage(`“${trimmedTitle}” captured in ${STATUS_LABELS[created.status]}.`);
+        setIsComposerOpen(false);
+        setComposerTitle('');
+        setComposerDueDate('');
+        setComposerChannel(CHANNEL_OPTIONS[0].value);
+        setComposerStatus(created.status);
+      } catch (err) {
+        console.error('Failed to create content item', err);
+        const fallbackMessage =
+          err instanceof ApiError
+            ? err.message || 'Unable to save content yet. Please try again once the pipeline API is live.'
+            : 'Unable to save content yet. Please try again once the pipeline API is live.';
+        setComposerError(fallbackMessage);
+      } finally {
+        setIsComposerSaving(false);
+      }
+    },
+    [composerChannel, composerDueDate, composerStatus, composerTitle, setSummary, setSuccessMessage, setError, user],
+  );
 
   const handleStatusChange = useCallback(
     async (item: ContentPipelineItem, nextStatus: ContentPipelineStatus) => {
@@ -348,13 +472,20 @@ const ContentPipelinePage = () => {
           })}
         </ul>
         <footer className="content-pipeline__column-footer">
-          <button type="button" className="content-pipeline__link-button">
+          <button
+            type="button"
+            className="content-pipeline__link-button"
+            onClick={() => openComposer(columnKey)}
+          >
             + Add content
           </button>
         </footer>
       </article>
     );
   };
+
+  const composerDueDateLabel =
+    composerStatus === ContentPipelineStatus.Scheduled ? 'Publishes on (optional)' : 'Due on (optional)';
 
   return (
     <div className="content-pipeline">
@@ -392,23 +523,50 @@ const ContentPipelinePage = () => {
             </button>
           </div>
         </div>
-        <div className="content-pipeline__view-toggle">
-          <span>View</span>
-          <button
-            type="button"
-            className={chipClass(viewType === 'board')}
-            onClick={() => setViewType('board')}
-          >
-            Board
-          </button>
-          <button type="button" className="content-pipeline__chip" disabled>
-            Timeline
-          </button>
+        <div className="content-pipeline__control-group">
+          <div className="content-pipeline__view-toggle">
+            <span>View</span>
+            <button
+              type="button"
+              className={chipClass(viewType === 'board')}
+              onClick={() => setViewType('board')}
+            >
+              Board
+            </button>
+            <button type="button" className="content-pipeline__chip" disabled>
+              Timeline
+            </button>
+          </div>
+          <div className="content-pipeline__search">
+            <label htmlFor="content-pipeline-search" className="visually-hidden">
+              Search content items
+            </label>
+            <input
+              id="content-pipeline-search"
+              type="search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder="Search content titles or copy…"
+            />
+            {debouncedSearch.length > 0 && (
+              <button
+                type="button"
+                className="content-pipeline__chip"
+                onClick={() => {
+                  setSearchTerm('');
+                  setDebouncedSearch('');
+                }}
+              >
+                Clear
+              </button>
+            )}
+          </div>
         </div>
       </section>
 
       {isLoading && <div className="content-pipeline__loading">Loading pipeline data…</div>}
       {error && <div className="content-pipeline__alert">{error}</div>}
+      {successMessage && <div className="content-pipeline__success">{successMessage}</div>}
 
       {viewType === 'board' ? (
         <section className="content-pipeline__board">{BOARD_COLUMNS.map((column) => renderColumn(column.key))}</section>
@@ -427,6 +585,93 @@ const ContentPipelinePage = () => {
           <li>Trigger publish handoff to scheduling service</li>
         </ul>
       </section>
+
+      {isComposerOpen && composerStatus && (
+        <div className="content-pipeline__modal-backdrop" role="presentation" onClick={closeComposer}>
+          <div
+            className="content-pipeline__modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="content-pipeline-composer-title"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <header>
+              <h3 id="content-pipeline-composer-title">Capture content idea</h3>
+              <p>Log a quick placeholder so the team can start moving work through the pipeline.</p>
+            </header>
+            <form onSubmit={handleComposerSubmit} className="content-pipeline__modal-form">
+              <div className="content-pipeline__modal-field">
+                <label htmlFor="composer-title">Working title</label>
+                <input
+                  id="composer-title"
+                  type="text"
+                  value={composerTitle}
+                  onChange={(event) => setComposerTitle(event.target.value)}
+                  placeholder="e.g. Q4 launch teaser video"
+                  autoFocus
+                />
+              </div>
+
+              <div className="content-pipeline__modal-field">
+                <label htmlFor="composer-status">Status</label>
+                <select
+                  id="composer-status"
+                  value={composerStatus}
+                  onChange={(event) => setComposerStatus(event.target.value as ContentPipelineStatus)}
+                >
+                  {BOARD_STATUS_OPTIONS.map((statusOption) => (
+                    <option key={statusOption} value={statusOption}>
+                      {STATUS_LABELS[statusOption]}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="content-pipeline__modal-field">
+                <label htmlFor="composer-channel">Channel</label>
+                <select
+                  id="composer-channel"
+                  value={composerChannel}
+                  onChange={(event) => setComposerChannel(event.target.value)}
+                >
+                  {CHANNEL_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="content-pipeline__modal-field">
+                <label htmlFor="composer-due">{composerDueDateLabel}</label>
+                <input
+                  id="composer-due"
+                  type="datetime-local"
+                  value={composerDueDate}
+                  onChange={(event) => setComposerDueDate(event.target.value)}
+                />
+                <span className="content-pipeline__modal-hint">Optional — leave blank if timing is undecided.</span>
+              </div>
+
+              {composerError && <p className="content-pipeline__modal-error">{composerError}</p>}
+
+              <div className="content-pipeline__modal-actions">
+                <button
+                  type="button"
+                  className="button button--secondary"
+                  onClick={closeComposer}
+                  disabled={isComposerSaving}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="button button--primary" disabled={isComposerSaving}>
+                  {isComposerSaving ? 'Saving…' : 'Save draft'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

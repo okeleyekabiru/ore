@@ -10,6 +10,7 @@ using Ore.Api.Validators.Auth;
 using Ore.Application;
 using Ore.Application.Abstractions.Identity;
 using Ore.Infrastructure;
+using Ore.Infrastructure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,6 +61,9 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+
+    using var scope = app.Services.CreateScope();
+    await DevelopmentIdentitySeeder.SeedAsync(scope.ServiceProvider, app.Configuration);
 }
 
 app.UseHttpsRedirection();
@@ -71,6 +75,6 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHealthChecks("/health");
 
-app.Run();
+await app.RunAsync();
 
 public partial class Program;

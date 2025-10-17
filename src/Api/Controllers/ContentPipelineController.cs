@@ -84,6 +84,43 @@ public sealed class ContentPipelineController : ApiControllerBase
         return FromResult(Result<ContentPipelineItemsResponse>.Success(response));
     }
 
+    [HttpPost("items")]
+    public async Task<IActionResult> CreateItem([FromBody] CreateContentPipelineItemRequest request, CancellationToken cancellationToken)
+    {
+        var actorId = _currentUserService.GetUserId();
+        var status = TryParseStatus(request.Status) ?? ContentStatus.Draft;
+        var platform = TryParsePlatform(request.Channel);
+
+        var command = new CreateContentItemCommand(
+            actorId,
+            request.TeamId,
+            request.Title,
+            status,
+            request.DueOnUtc,
+            platform);
+
+        var result = await Mediator.Send(command, cancellationToken);
+
+        if (!result.Succeeded || result.Value is null)
+        {
+            return FromResult(Result<ContentPipelineItemResponse>.Failure([.. result.Errors]));
+        }
+
+        var item = result.Value;
+        var response = new ContentPipelineItemResponse(
+            item.Id,
+            item.TeamId,
+            item.Title,
+            item.Status,
+            new ContentPipelineChannelResponse(item.Channel.Id, item.Channel.Name),
+            new ContentPipelineOwnerResponse(item.Owner.Id, item.Owner.Name),
+            item.UpdatedOnUtc,
+            item.DueOnUtc,
+            item.ScheduledOnUtc);
+
+        return FromResult(Result<ContentPipelineItemResponse>.Success(response), "Content item captured.");
+    }
+
     [HttpPatch("items/{contentId:guid}/status")]
     public async Task<IActionResult> UpdateStatus(Guid contentId, [FromBody] UpdateContentPipelineStatusRequest request, CancellationToken cancellationToken)
     {

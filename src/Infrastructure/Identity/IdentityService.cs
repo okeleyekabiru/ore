@@ -101,4 +101,26 @@ public sealed class IdentityService : IIdentityService
         var roles = await _userManager.GetRolesAsync(user);
         return roles.ToArray();
     }
+
+    public async Task AssignRoleAsync(Guid userId, string role, CancellationToken cancellationToken = default)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user is null)
+        {
+            throw new InvalidOperationException("User not found");
+        }
+
+        if (!await _roleManager.RoleExistsAsync(role))
+        {
+            await _roleManager.CreateAsync(new IdentityRole<Guid>(role));
+        }
+
+        var existingRoles = await _userManager.GetRolesAsync(user);
+        if (existingRoles.Any())
+        {
+            await _userManager.RemoveFromRolesAsync(user, existingRoles);
+        }
+
+        await _userManager.AddToRoleAsync(user, role);
+    }
 }

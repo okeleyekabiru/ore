@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2025-10-16T12:15:00Z",
+  "lastUpdated": "2025-10-17T16:35:00Z",
   "features": [
     {
       "name": "Authentication & API Plumbing",
@@ -8,7 +8,8 @@
       "details": [
         "Identity service authenticates ASP.NET Identity users",
         "JWT token service issues access tokens with role/team claims",
-        "AuthController exposes register and login endpoints"
+        "AuthController exposes register and login endpoints",
+        "Admin-only AssignRole endpoint updates Identity + domain roles"
       ]
     },
     {
@@ -84,9 +85,22 @@
         "Brand survey page lists templates via API and handles auth errors",
         "Brand survey creation form validates inputs and posts to API",
         "JSON template importer maps survey questions, provisions via API, and links a sample download",
-  "Content pipeline board loads pipeline summary/items with graceful fallback and supports inline status transitions",
+        "Content pipeline board loads pipeline summary/items with graceful fallback and supports inline status transitions",
+        "Pipeline search box debounces queries and filters column data via the API",
+        "Column-level add buttons post to the pipeline create endpoint and update board counts in real time",
         "Overview quick action navigates to the pipeline module",
         "Signup page collects registration details and links back to login"
+      ]
+    },
+    {
+      "name": "Content Pipeline API",
+      "description": "Backend endpoints and commands for managing content pipeline items and workflow transitions.",
+      "status": "in-progress",
+      "details": [
+        "CreateContentItemCommand persists new pipeline entries with optional scheduling",
+        "ContentPipelineController exposes POST /api/content-pipeline/items for creation",
+        "Shared ContentPipelineMapper reused across queries and command responses",
+        "Dashboard service maps UI statuses to API enums and back"
       ]
     },
     {

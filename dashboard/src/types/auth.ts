@@ -7,6 +7,7 @@ export const ROLE_TYPES = {
 } as const;
 
 export type RoleType = (typeof ROLE_TYPES)[keyof typeof ROLE_TYPES];
+export type RoleName = keyof typeof ROLE_TYPES;
 
 export interface LoginRequest {
   email: string;
@@ -58,4 +59,9 @@ export interface RegisterRequest {
   role: RoleType;
   teamName?: string | null;
   isIndividual: boolean;
+}
+
+export interface AssignRoleRequest {
+  userId: string;
+  role: RoleName;
 }

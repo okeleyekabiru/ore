@@ -12,4 +12,5 @@ public interface IIdentityService
     Task<bool> IsInRoleAsync(Guid userId, string role, CancellationToken cancellationToken = default);
     Task<AuthenticationResult?> AuthenticateAsync(string email, string password, CancellationToken cancellationToken = default);
     Task<IReadOnlyCollection<string>> GetRolesAsync(Guid userId, CancellationToken cancellationToken = default);
+    Task AssignRoleAsync(Guid userId, string role, CancellationToken cancellationToken = default);
 }

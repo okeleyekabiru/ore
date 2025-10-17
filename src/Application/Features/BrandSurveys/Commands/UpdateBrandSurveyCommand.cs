@@ -40,21 +40,6 @@ public sealed class UpdateBrandSurveyCommandHandler : IRequestHandler<UpdateBran
 
         survey.UpdateDetails(request.Title, request.Description);
 
-        var existingQuestions = survey.Questions.ToList();
-        if (existingQuestions.Count > 0)
-        {
-            var optionEntries = existingQuestions.SelectMany(q => q.Options).ToList();
-            if (optionEntries.Count > 0)
-            {
-                _dbContext.SurveyOptions.RemoveRange(optionEntries);
-            }
-
-            survey.RemoveQuestions(existingQuestions.Select(q => q.Id));
-            _dbContext.SurveyQuestions.RemoveRange(existingQuestions);
-
-            await _dbContext.SaveChangesAsync(cancellationToken);
-        }
-
         var sanitizedQuestions = request.Questions
             .Select(q => (
                 Prompt: q.Prompt,
@@ -66,9 +51,45 @@ public sealed class UpdateBrandSurveyCommandHandler : IRequestHandler<UpdateBran
             .OrderBy(q => q.Order)
             .ToList();
 
-        foreach (var question in sanitizedQuestions)
+        var trackedQuestions = survey.Questions
+            .OrderBy(q => q.Order)
+            .ToList();
+
+        var pairedCount = Math.Min(trackedQuestions.Count, sanitizedQuestions.Count);
+
+        for (var i = 0; i < pairedCount; i++)
         {
-            survey.AddQuestion(question.Prompt, question.Type, question.Order, question.Options);
+            var existingQuestion = trackedQuestions[i];
+            var incoming = sanitizedQuestions[i];
+
+            if (existingQuestion.Options.Any())
+            {
+                _dbContext.SurveyOptions.RemoveRange(existingQuestion.Options);
+            }
+
+            existingQuestion.Update(incoming.Prompt, incoming.Type, incoming.Order, incoming.Options);
+        }
+
+        if (trackedQuestions.Count > sanitizedQuestions.Count)
+        {
+            var toRemove = trackedQuestions.Skip(sanitizedQuestions.Count).ToArray();
+
+            var orphanOptions = toRemove.SelectMany(q => q.Options).ToArray();
+            if (orphanOptions.Length > 0)
+            {
+                _dbContext.SurveyOptions.RemoveRange(orphanOptions);
+            }
+
+            survey.RemoveQuestions(toRemove.Select(q => q.Id));
+            _dbContext.SurveyQuestions.RemoveRange(toRemove);
+        }
+
+        if (sanitizedQuestions.Count > trackedQuestions.Count)
+        {
+            foreach (var question in sanitizedQuestions.Skip(trackedQuestions.Count))
+            {
+                survey.AddQuestion(question.Prompt, question.Type, question.Order, question.Options);
+            }
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);

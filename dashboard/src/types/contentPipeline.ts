@@ -9,6 +9,15 @@ export const ContentPipelineStatus = {
 
 export type ContentPipelineStatus = (typeof ContentPipelineStatus)[keyof typeof ContentPipelineStatus];
 
+export type ContentPipelineApiStatus =
+  | 'Draft'
+  | 'Generated'
+  | 'PendingApproval'
+  | 'Approved'
+  | 'Scheduled'
+  | 'Published'
+  | 'Rejected';
+
 export interface ContentPipelineSummary {
   status: ContentPipelineStatus;
   count: number;
@@ -56,4 +65,12 @@ export interface ContentPipelineItemsResponse {
 export interface UpdateContentPipelineStatusPayload {
   status: ContentPipelineStatus;
   scheduledOnUtc?: string | null;
+}
+
+export interface CreateContentPipelineItemPayload {
+  title: string;
+  status: ContentPipelineStatus;
+  channel: string;
+  dueOnUtc?: string | null;
+  teamId?: string | null;
 }

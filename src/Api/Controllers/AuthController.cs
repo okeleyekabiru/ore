@@ -1,3 +1,4 @@
+using System;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -5,10 +6,10 @@ using Ore.Api.Common;
 using Ore.Api.Contracts.Auth;
 using Ore.Application.Common.Models;
 using Ore.Application.Features.Users.Commands;
+using Ore.Domain.Enums;
 
 namespace Ore.Api.Controllers;
 
-[AllowAnonymous]
 public sealed class AuthController : ApiControllerBase
 {
     public AuthController(IMediator mediator) : base(mediator)
@@ -16,6 +17,7 @@ public sealed class AuthController : ApiControllerBase
     }
 
     [HttpPost("register")]
+    [AllowAnonymous]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
     {
         var command = new RegisterUserCommand(
@@ -32,6 +34,7 @@ public sealed class AuthController : ApiControllerBase
     }
 
     [HttpPost("login")]
+    [AllowAnonymous]
     public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken cancellationToken)
     {
         var result = await Mediator.Send(new AuthenticateUserCommand(request.Email, request.Password), cancellationToken);
@@ -39,9 +42,29 @@ public sealed class AuthController : ApiControllerBase
     }
 
     [HttpPost("refresh")]
+    [AllowAnonymous]
     public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest request, CancellationToken cancellationToken)
     {
         var result = await Mediator.Send(new RefreshAccessTokenCommand(request.RefreshToken), cancellationToken);
         return FromResult(result, "Token refreshed successfully.");
+    }
+
+    [HttpPost("assign-role")]
+    [Authorize(Roles = nameof(RoleType.Admin))]
+    public async Task<IActionResult> AssignRole([FromBody] AssignRoleRequest request, CancellationToken cancellationToken)
+    {
+        if (!Enum.TryParse<RoleType>(request.Role, ignoreCase: true, out var role))
+        {
+            return FromResult(Result<Guid>.Failure("Unsupported role value provided."));
+        }
+
+        if (request.UserId == Guid.Empty)
+        {
+            return FromResult(Result<Guid>.Failure("UserId must be provided."));
+        }
+
+        var command = new AssignRoleCommand(request.UserId, role);
+        var result = await Mediator.Send(command, cancellationToken);
+        return FromResult(result, "User role updated.");
     }
 }
