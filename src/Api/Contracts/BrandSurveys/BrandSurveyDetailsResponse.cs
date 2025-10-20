@@ -9,6 +9,7 @@ public sealed record BrandSurveyDetailsResponse(
     Guid TeamId,
     string Title,
     string Description,
+    string Category,
     bool IsActive,
     IEnumerable<BrandSurveyQuestionDetails> Questions);
 

@@ -38,6 +38,7 @@ public sealed class BrandSurveysControllerTests : IClassFixture<TestWebApplicati
         var updateRequest = new UpdateBrandSurveyRequest(
             "Updated Survey",
             "Refined description",
+            "Onboarding",
             new[]
             {
                 new UpdateSurveyQuestionRequest("Primary choice", SurveyQuestionType.SingleChoice, 0, new[] { "Option A", "Option B" }),
@@ -67,7 +68,7 @@ public sealed class BrandSurveysControllerTests : IClassFixture<TestWebApplicati
         var teamId = await CreateTeamAsync("Beta Team");
         var surveyId = await CreateSurveyAsync(teamId, "Validation Survey");
 
-        var updateRequest = new UpdateBrandSurveyRequest(string.Empty, string.Empty, Array.Empty<UpdateSurveyQuestionRequest>());
+    var updateRequest = new UpdateBrandSurveyRequest(string.Empty, string.Empty, string.Empty, Array.Empty<UpdateSurveyQuestionRequest>());
 
         var response = await _client.PutAsJsonAsync($"/api/brand-surveys/{surveyId}", updateRequest);
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -116,6 +117,7 @@ public sealed class BrandSurveysControllerTests : IClassFixture<TestWebApplicati
             teamId,
             title,
             $"{title} description",
+            "Onboarding",
             new[]
             {
                 new CreateSurveyQuestionRequest("Describe your brand", SurveyQuestionType.Text, 0, Array.Empty<string>())

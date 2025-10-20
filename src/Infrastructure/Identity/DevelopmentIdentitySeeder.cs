@@ -34,22 +34,30 @@ public static class DevelopmentIdentitySeeder
             return;
         }
 
-        var firstName = adminSection.GetValue<string>("FirstName") ?? "Admin";
-        var lastName = adminSection.GetValue<string>("LastName") ?? "User";
+    var firstName = adminSection.GetValue<string>("FirstName") ?? "Admin";
+    var lastName = adminSection.GetValue<string>("LastName") ?? "User";
+        var teamName = adminSection.GetValue<string>("TeamName") ?? "Development Team";
 
         var dbContext = services.GetRequiredService<ApplicationDbContext>();
         var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
         var dateTimeProvider = services.GetRequiredService<IDateTimeProvider>();
 
-        try
+        if (dbContext.Database.IsRelational())
         {
-            await dbContext.Database.MigrateAsync(cancellationToken);
-        }
-        catch (InvalidOperationException ex) when (ex.Message.Contains("PendingModelChangesWarning", StringComparison.Ordinal))
-        {
-            logger?.LogWarning(ex, "Skipping development identity seeding because the EF model has pending changes. Add a migration or update the model.");
-            return;
+            var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync(cancellationToken);
+            if (pendingMigrations.Any())
+            {
+                try
+                {
+                    await dbContext.Database.MigrateAsync(cancellationToken);
+                }
+                catch (InvalidOperationException ex) when (ex.Message.Contains("PendingModelChangesWarning", StringComparison.Ordinal))
+                {
+                    logger?.LogWarning(ex, "Development database has pending model changes. Skipping identity seeding until migrations are updated.");
+                    return;
+                }
+            }
         }
 
         foreach (var role in Enum.GetValues<RoleType>())
@@ -58,6 +66,20 @@ public static class DevelopmentIdentitySeeder
             if (!await roleManager.RoleExistsAsync(roleName))
             {
                 await roleManager.CreateAsync(new IdentityRole<Guid>(roleName));
+            }
+        }
+
+        Team? team = null;
+        if (!string.IsNullOrWhiteSpace(teamName))
+        {
+            var trimmedName = teamName.Trim();
+            team = await dbContext.Teams.FirstOrDefaultAsync(t => t.Name == trimmedName, cancellationToken);
+
+            if (team is null)
+            {
+                team = new Team(trimmedName);
+                dbContext.Teams.Add(team);
+                logger?.LogInformation("Created development team {TeamName} for seeded admin.", trimmedName);
             }
         }
 
@@ -142,6 +164,11 @@ public static class DevelopmentIdentitySeeder
                 CreatedBy = adminUser.Id.ToString()
             };
 
+            if (team is not null)
+            {
+                team.AddMember(domainUser);
+            }
+
             domainUsers.Add(domainUser);
             await dbContext.SaveChangesAsync(cancellationToken);
             logger?.LogInformation("Development admin domain user created for {Email}.", email);
@@ -153,6 +180,11 @@ public static class DevelopmentIdentitySeeder
             domainUser.Activate();
             domainUser.ModifiedOnUtc = dateTimeProvider.UtcNow;
             domainUser.ModifiedBy = adminUser.Id.ToString();
+
+            if (team is not null)
+            {
+                team.AddMember(domainUser);
+            }
 
             await dbContext.SaveChangesAsync(cancellationToken);
         }

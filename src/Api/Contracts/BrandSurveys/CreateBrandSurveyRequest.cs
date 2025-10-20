@@ -8,6 +8,7 @@ public sealed record CreateBrandSurveyRequest(
     Guid TeamId,
     string Title,
     string Description,
+    string Category,
     IEnumerable<CreateSurveyQuestionRequest> Questions);
 
 public sealed record CreateSurveyQuestionRequest(

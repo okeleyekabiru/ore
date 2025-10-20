@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { FormEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PageHeader from '../../components/common/PageHeader';
 import { useAuth } from '../../contexts/AuthContext';
 import { contentPipelineService } from '../../services/contentPipelineService';
@@ -147,6 +148,7 @@ const getDateBadge = (item: ContentPipelineItem) => {
 
 const ContentPipelinePage = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [selectedFilter, setSelectedFilter] = useState<FilterKey>('all');
   const [viewType, setViewType] = useState<'board' | 'timeline'>('board');
   const [boardItems, setBoardItems] = useState<BoardState>(() => groupItemsByStatus(FALLBACK_ITEMS));
@@ -493,6 +495,11 @@ const ContentPipelinePage = () => {
         eyebrow="Workflow"
         title="Content pipeline"
         description="Track drafting, approval, and scheduling status across channels. Pipeline endpoints wire in automatically once available."
+        actions={
+          <button type="button" className="button button--primary" onClick={() => navigate('/content/generate')}>
+            Launch generator
+          </button>
+        }
       />
 
       <section className="content-pipeline__controls">

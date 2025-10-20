@@ -7,6 +7,7 @@ public sealed record BrandSurveySummaryResponse(
     Guid TeamId,
     string Title,
     string Description,
+    string Category,
     bool IsActive,
     int QuestionCount,
     DateTime CreatedOnUtc,

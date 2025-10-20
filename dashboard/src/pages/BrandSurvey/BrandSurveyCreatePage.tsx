@@ -49,6 +49,7 @@ const BrandSurveyCreatePage = () => {
   const [teamId, setTeamId] = useState<string>(user?.teamId ?? '');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [category, setCategory] = useState('Onboarding');
   const [questions, setQuestions] = useState<QuestionDraft[]>([{ ...DEFAULT_QUESTION }]);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -107,6 +108,10 @@ const BrandSurveyCreatePage = () => {
       return 'Survey title is required.';
     }
 
+    if (!category.trim()) {
+      return 'Provide a survey category to help organize templates.';
+    }
+
     if (questions.length === 0) {
       return 'Add at least one question to the survey.';
     }
@@ -144,6 +149,7 @@ const BrandSurveyCreatePage = () => {
         teamId,
         title: title.trim(),
         description: description.trim(),
+        category: category.trim(),
         questions: orderedQuestions.map((question, index) => ({
           prompt: question.prompt.trim(),
           type: question.type,
@@ -210,6 +216,17 @@ const BrandSurveyCreatePage = () => {
               value={description}
               onChange={(event: ChangeEvent<HTMLTextAreaElement>) => setDescription(event.target.value)}
               placeholder="Short summary to help your team understand when to use this survey."
+            />
+          </label>
+
+          <label className="brand-survey-create__field">
+            <span>Category</span>
+            <input
+              type="text"
+              value={category}
+              onChange={(event: ChangeEvent<HTMLInputElement>) => setCategory(event.target.value)}
+              placeholder="Onboarding"
+              required
             />
           </label>
 

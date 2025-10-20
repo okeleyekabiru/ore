@@ -14,7 +14,7 @@ namespace Ore.Application.Features.BrandSurveys.Commands;
 
 public sealed record SurveyAnswerInput(Guid QuestionId, string Value, string? Metadata);
 
-public sealed record BrandVoiceProfileInput(string Voice, string Tone, string Audience, IEnumerable<string> Keywords);
+public sealed record BrandVoiceProfileInput(string Voice, string Tone, string Audience, string Goals, string Competitors, IEnumerable<string> Keywords);
 
 public sealed record SubmitBrandSurveyCommand(Guid SurveyId, Guid UserId, IEnumerable<SurveyAnswerInput> Answers, BrandVoiceProfileInput? VoiceProfile)
     : IRequest<Result<Guid>>;
@@ -79,6 +79,8 @@ public sealed class SubmitBrandSurveyCommandHandler : IRequestHandler<SubmitBran
                 request.VoiceProfile.Voice,
                 request.VoiceProfile.Tone,
                 request.VoiceProfile.Audience,
+                request.VoiceProfile.Goals,
+                request.VoiceProfile.Competitors,
                 request.VoiceProfile.Keywords);
 
             var team = await _dbContext.Teams.FirstOrDefaultAsync(t => t.Id == survey.TeamId, cancellationToken);

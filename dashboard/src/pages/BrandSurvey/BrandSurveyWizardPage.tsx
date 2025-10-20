@@ -4,15 +4,19 @@ import PageHeader from '../../components/common/PageHeader';
 import { ApiError } from '../../types/api';
 import { listBrandSurveys } from '../../services/brandSurveyService';
 import type { BrandSurveySummary } from '../../types/brandSurvey';
+import { useAuth } from '../../contexts/AuthContext';
+import { ROLE_TYPES } from '../../types/auth';
 import './BrandSurveyWizardPage.css';
 
 type LoadState = 'idle' | 'loading' | 'success' | 'error';
 
 const BrandSurveyWizardPage = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [surveys, setSurveys] = useState<BrandSurveySummary[]>([]);
   const [state, setState] = useState<LoadState>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const isAdmin = user?.role === ROLE_TYPES.Admin;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -92,6 +96,10 @@ const BrandSurveyWizardPage = () => {
                 <dd>{survey.questionCount}</dd>
               </div>
               <div>
+                <dt>Category</dt>
+                <dd>{survey.category}</dd>
+              </div>
+              <div>
                 <dt>Team</dt>
                 <dd>{survey.teamId}</dd>
               </div>
@@ -113,22 +121,24 @@ const BrandSurveyWizardPage = () => {
         title="Brand survey templates"
         description="Fetches the latest surveys from the API so you can track onboarding coverage and jump into the wizard."
         actions={
-          <div className="brand-survey__actions">
-            <button
-              type="button"
-              className="button button--secondary"
-              onClick={() => navigate('/onboarding/brand-survey/import')}
-            >
-              Import template
-            </button>
-            <button
-              type="button"
-              className="button button--primary"
-              onClick={() => navigate('/onboarding/brand-survey/create')}
-            >
-              Create survey
-            </button>
-          </div>
+            isAdmin ? (
+              <div className="brand-survey__actions">
+                <button
+                  type="button"
+                  className="button button--secondary"
+                  onClick={() => navigate('/onboarding/brand-survey/import')}
+                >
+                  Import template
+                </button>
+                <button
+                  type="button"
+                  className="button button--primary"
+                  onClick={() => navigate('/onboarding/brand-survey/create')}
+                >
+                  Create survey
+                </button>
+              </div>
+            ) : undefined
         }
       />
 

@@ -14,7 +14,7 @@ namespace Ore.Application.Features.BrandSurveys.Commands;
 
 public sealed record SurveyQuestionDto(string Prompt, SurveyQuestionType Type, int Order, IEnumerable<string> Options);
 
-public sealed record CreateBrandSurveyCommand(Guid TeamId, string Title, string Description, IEnumerable<SurveyQuestionDto> Questions)
+public sealed record CreateBrandSurveyCommand(Guid TeamId, string Title, string Description, string Category, IEnumerable<SurveyQuestionDto> Questions)
     : IRequest<Result<Guid>>;
 
 public sealed class CreateBrandSurveyCommandHandler : IRequestHandler<CreateBrandSurveyCommand, Result<Guid>>
@@ -35,7 +35,7 @@ public sealed class CreateBrandSurveyCommandHandler : IRequestHandler<CreateBran
             return Result<Guid>.Failure("Team not found");
         }
 
-        var survey = new BrandSurvey(request.TeamId, request.Title, request.Description);
+    var survey = new BrandSurvey(request.TeamId, request.Title, request.Description, request.Category);
 
         foreach (var question in request.Questions.OrderBy(q => q.Order))
         {

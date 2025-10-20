@@ -59,9 +59,19 @@ export interface RegisterRequest {
   role: RoleType;
   teamName?: string | null;
   isIndividual: boolean;
+  brandSurvey: BrandSurveyOnboardingRequest;
 }
 
 export interface AssignRoleRequest {
   userId: string;
   role: RoleName;
+}
+
+export interface BrandSurveyOnboardingRequest {
+  voice: string;
+  tone: string;
+  goals: string;
+  audience: string;
+  competitors: string;
+  keywords: string[];
 }

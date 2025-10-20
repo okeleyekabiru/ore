@@ -5,10 +5,13 @@ import BrandSurveyWizardPage from '../pages/BrandSurvey/BrandSurveyWizardPage';
 import BrandSurveyCreatePage from '../pages/BrandSurvey/BrandSurveyCreatePage';
 import BrandSurveyImportPage from '../pages/BrandSurvey/BrandSurveyImportPage';
 import ContentPipelinePage from '../pages/ContentPipeline/ContentPipelinePage';
+import ContentGenerationPage from '../pages/ContentGeneration/ContentGenerationPage';
 import NotFoundPage from '../pages/NotFound/NotFoundPage';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
+import RequireRole from '../components/auth/RequireRole';
 import LoginPage from '../pages/Auth/LoginPage';
 import SignUpPage from '../pages/Auth/SignUpPage';
+import { ROLE_TYPES } from '../types/auth';
 
 export const appRouter = createBrowserRouter([
   {
@@ -37,15 +40,27 @@ export const appRouter = createBrowserRouter([
           },
           {
             path: 'onboarding/brand-survey/create',
-            element: <BrandSurveyCreatePage />,
+            element: (
+              <RequireRole allowedRoles={[ROLE_TYPES.Admin]}>
+                <BrandSurveyCreatePage />
+              </RequireRole>
+            ),
           },
           {
             path: 'onboarding/brand-survey/import',
-            element: <BrandSurveyImportPage />,
+            element: (
+              <RequireRole allowedRoles={[ROLE_TYPES.Admin]}>
+                <BrandSurveyImportPage />
+              </RequireRole>
+            ),
           },
           {
             path: 'content/pipeline',
             element: <ContentPipelinePage />,
+          },
+          {
+            path: 'content/generate',
+            element: <ContentGenerationPage />,
           },
         ],
       },

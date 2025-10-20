@@ -17,4 +17,6 @@ public sealed record BrandVoiceProfileRequest(
     string Voice,
     string Tone,
     string Audience,
+    string Goals,
+    string Competitors,
     IEnumerable<string> Keywords);

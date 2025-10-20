@@ -8,7 +8,8 @@ public sealed class GenerateContentCommandValidator : AbstractValidator<Generate
     {
         RuleFor(x => x.TeamId).NotEmpty();
         RuleFor(x => x.RequestedBy).NotEmpty();
-        RuleFor(x => x.Prompt).NotEmpty();
-        RuleFor(x => x.Model).NotEmpty();
+        RuleFor(x => x.Topic).NotEmpty();
+        RuleFor(x => x.Tone).NotEmpty();
+        RuleFor(x => x.Platform).IsInEnum();
     }
 }

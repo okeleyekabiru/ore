@@ -13,6 +13,7 @@ export interface BrandSurveySummary {
   teamId: string;
   title: string;
   description: string;
+  category: string;
   isActive: boolean;
   questionCount: number;
   createdOnUtc: string;
@@ -22,7 +23,7 @@ export interface BrandSurveySummary {
 export interface BrandSurveyQuestionDetails {
   id: string;
   prompt: string;
-  type: string;
+  type: SurveyQuestionType;
   order: number;
   options: string[];
 }
@@ -32,6 +33,7 @@ export interface BrandSurveyDetails {
   teamId: string;
   title: string;
   description: string;
+  category: string;
   isActive: boolean;
   questions: BrandSurveyQuestionDetails[];
 }
@@ -47,5 +49,6 @@ export interface CreateBrandSurveyPayload {
   teamId: string;
   title: string;
   description: string;
+  category: string;
   questions: CreateSurveyQuestionPayload[];
 }

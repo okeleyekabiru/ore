@@ -18,6 +18,10 @@ internal sealed class BrandSurveyConfiguration : IEntityTypeConfiguration<BrandS
             .IsRequired()
             .HasMaxLength(2000);
 
+        builder.Property(bs => bs.Category)
+            .IsRequired()
+            .HasMaxLength(200);
+
         builder.HasMany(bs => bs.Questions)
             .WithOne()
             .HasForeignKey(sq => sq.SurveyId);

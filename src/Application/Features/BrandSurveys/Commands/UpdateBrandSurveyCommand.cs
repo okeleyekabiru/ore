@@ -15,6 +15,7 @@ public sealed record UpdateBrandSurveyCommand(
     Guid SurveyId,
     string Title,
     string Description,
+    string Category,
     IEnumerable<SurveyQuestionDto> Questions) : IRequest<Result<Guid>>;
 
 public sealed class UpdateBrandSurveyCommandHandler : IRequestHandler<UpdateBrandSurveyCommand, Result<Guid>>
@@ -38,7 +39,7 @@ public sealed class UpdateBrandSurveyCommandHandler : IRequestHandler<UpdateBran
             return Result<Guid>.Failure("Survey not found");
         }
 
-        survey.UpdateDetails(request.Title, request.Description);
+    survey.UpdateDetails(request.Title, request.Description, request.Category);
 
         var sanitizedQuestions = request.Questions
             .Select(q => (

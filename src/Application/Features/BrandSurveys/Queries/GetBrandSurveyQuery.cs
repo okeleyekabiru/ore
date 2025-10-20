@@ -18,6 +18,7 @@ public sealed record BrandSurveyResponse(
     Guid TeamId,
     string Title,
     string Description,
+    string Category,
     bool IsActive,
     IEnumerable<SurveyQuestionResponse> Questions);
 
@@ -50,6 +51,7 @@ public sealed class GetBrandSurveyQueryHandler : IRequestHandler<GetBrandSurveyQ
             survey.TeamId,
             survey.Title,
             survey.Description,
+            survey.Category,
             survey.IsActive,
             survey.Questions
                 .OrderBy(q => q.Order)

@@ -34,6 +34,8 @@ internal sealed class TeamConfiguration : IEntityTypeConfiguration<Team>
             ownedBuilder.Property(bv => bv.Voice).HasMaxLength(200);
             ownedBuilder.Property(bv => bv.Tone).HasMaxLength(200);
             ownedBuilder.Property(bv => bv.Audience).HasMaxLength(200);
+            ownedBuilder.Property(bv => bv.Goals).HasMaxLength(1000);
+            ownedBuilder.Property(bv => bv.Competitors).HasMaxLength(1000);
             ownedBuilder.Property(bv => bv.Keywords)
                 .HasConversion(
                     v => string.Join(',', v ?? Array.Empty<string>()),

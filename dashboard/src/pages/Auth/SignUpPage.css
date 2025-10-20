@@ -98,7 +98,8 @@
 }
 
 .signup-form__field input,
-.signup-form__field select {
+.signup-form__field select,
+.signup-form__field textarea {
   padding: 0.8rem 1rem;
   border-radius: 0.85rem;
   border: 1px solid var(--border-subtle);
@@ -106,13 +107,44 @@
   background: var(--surface-subtle);
   color: var(--text-primary);
   transition: border 0.15s ease, box-shadow 0.15s ease;
+  resize: vertical;
 }
 
 .signup-form__field input:focus,
-.signup-form__field select:focus {
+.signup-form__field select:focus,
+.signup-form__field textarea:focus {
   outline: none;
   border-color: var(--accent-primary);
   box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.2);
+}
+
+.signup-form__section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  margin-top: 0.5rem;
+  padding: 1.2rem 1.1rem 1.4rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+  background: var(--surface-subtle);
+}
+
+.signup-form__section-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.signup-form__section-header h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.signup-form__section-header p {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
 }
 
 .signup-form__helper {

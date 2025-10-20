@@ -6,6 +6,7 @@ namespace Ore.Api.Contracts.BrandSurveys;
 public sealed record UpdateBrandSurveyRequest(
     string Title,
     string Description,
+    string Category,
     IEnumerable<UpdateSurveyQuestionRequest> Questions);
 
 public sealed record UpdateSurveyQuestionRequest(

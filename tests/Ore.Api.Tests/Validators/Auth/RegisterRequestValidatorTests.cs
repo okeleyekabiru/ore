@@ -8,6 +8,14 @@ public sealed class RegisterRequestValidatorTests
 {
     private readonly RegisterRequestValidator _validator = new();
 
+    private static BrandSurveyOnboardingRequest CreateBrandSurveyPayload() => new(
+        "Confident",
+        "Friendly",
+        "Marketing leaders",
+        "Grow awareness",
+        "Legacy brands",
+        new[] { "Helpful", "Approachable" });
+
     [Fact]
     public void Validate_WithValidInput_ReturnsValidResult()
     {
@@ -18,7 +26,8 @@ public sealed class RegisterRequestValidatorTests
             "Doe",
             RoleType.Admin,
             null,
-            true);
+            true,
+            CreateBrandSurveyPayload());
 
         var result = _validator.Validate(request);
 
@@ -39,7 +48,8 @@ public sealed class RegisterRequestValidatorTests
             "Doe",
             RoleType.Admin,
             null,
-            true);
+            true,
+            CreateBrandSurveyPayload());
 
         var result = _validator.Validate(request);
 
@@ -60,7 +70,8 @@ public sealed class RegisterRequestValidatorTests
             "Doe",
             RoleType.Admin,
             null,
-            true);
+            true,
+            CreateBrandSurveyPayload());
 
         var result = _validator.Validate(request);
 
@@ -81,7 +92,8 @@ public sealed class RegisterRequestValidatorTests
             name ?? string.Empty,
             RoleType.Admin,
             null,
-            true);
+            true,
+            CreateBrandSurveyPayload());
 
         var result = _validator.Validate(request);
 
@@ -99,7 +111,8 @@ public sealed class RegisterRequestValidatorTests
             "Doe",
             RoleType.SocialMediaManager,
             null,
-            false);
+            false,
+            CreateBrandSurveyPayload());
 
         var result = _validator.Validate(request);
 

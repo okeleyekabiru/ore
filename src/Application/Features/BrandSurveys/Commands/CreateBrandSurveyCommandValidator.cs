@@ -8,6 +8,7 @@ public sealed class CreateBrandSurveyCommandValidator : AbstractValidator<Create
     {
         RuleFor(x => x.TeamId).NotEmpty();
         RuleFor(x => x.Title).NotEmpty();
+        RuleFor(x => x.Category).NotEmpty();
         RuleFor(x => x.Questions)
             .NotEmpty();
     }

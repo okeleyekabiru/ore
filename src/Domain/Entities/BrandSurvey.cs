@@ -14,24 +14,27 @@ public sealed class BrandSurvey : AuditableEntity, IAggregateRoot
     {
     }
 
-    public BrandSurvey(Guid teamId, string title, string description)
+    public BrandSurvey(Guid teamId, string title, string description, string category)
     {
         TeamId = teamId;
         Title = title.Trim();
         Description = description.Trim();
+        Category = category.Trim();
     }
 
     public Guid TeamId { get; private set; }
     public string Title { get; private set; } = string.Empty;
     public string Description { get; private set; } = string.Empty;
     public bool IsActive { get; private set; } = true;
+    public string Category { get; private set; } = string.Empty;
 
     public IReadOnlyCollection<SurveyQuestion> Questions => _questions;
 
-    public void UpdateDetails(string title, string description)
+    public void UpdateDetails(string title, string description, string category)
     {
         Title = title.Trim();
         Description = description.Trim();
+        Category = category.Trim();
     }
 
     public void AddQuestion(string prompt, SurveyQuestionType type, int order, IEnumerable<string>? options = null)

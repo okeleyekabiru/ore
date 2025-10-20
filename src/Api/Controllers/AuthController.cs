@@ -20,6 +20,11 @@ public sealed class AuthController : ApiControllerBase
     [AllowAnonymous]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request, CancellationToken cancellationToken)
     {
+        if (request.BrandSurvey is null)
+        {
+            return FromResult(Result<Guid>.Failure("Brand survey onboarding details are required."));
+        }
+
         var command = new RegisterUserCommand(
             request.Email,
             request.Password,
@@ -27,7 +32,14 @@ public sealed class AuthController : ApiControllerBase
             request.LastName,
             request.Role,
             request.TeamName,
-            request.IsIndividual);
+            request.IsIndividual,
+            new BrandSurveyOnboardingInput(
+                request.BrandSurvey.Voice,
+                request.BrandSurvey.Tone,
+                request.BrandSurvey.Audience,
+                request.BrandSurvey.Goals,
+                request.BrandSurvey.Competitors,
+                request.BrandSurvey.Keywords ?? Array.Empty<string>()));
 
         var result = await Mediator.Send(command, cancellationToken);
         return FromResult(result, "User registered successfully.");

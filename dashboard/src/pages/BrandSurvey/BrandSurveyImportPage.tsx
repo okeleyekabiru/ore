@@ -21,6 +21,7 @@ interface TemplateInput {
   teamId?: unknown;
   title?: unknown;
   description?: unknown;
+  category?: unknown;
   questions?: unknown;
 }
 
@@ -83,6 +84,11 @@ const parseTemplate = (template: unknown) => {
 
   const description = typeof input.description === 'string' ? input.description.trim() : '';
 
+  const category = typeof input.category === 'string' && input.category.trim().length > 0 ? input.category.trim() : null;
+  if (!category) {
+    throw new Error('Template is missing a category. Add a descriptive category such as "Onboarding".');
+  }
+
   if (!Array.isArray(input.questions) || input.questions.length === 0) {
     throw new Error('Template requires at least one question.');
   }
@@ -121,6 +127,7 @@ const parseTemplate = (template: unknown) => {
     teamId,
     title,
     description,
+    category,
     questions: sortedQuestions,
   };
 };

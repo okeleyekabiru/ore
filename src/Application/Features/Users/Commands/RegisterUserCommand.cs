@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,8 +11,17 @@ using Ore.Application.Abstractions.Persistence;
 using Ore.Application.Common.Models;
 using Ore.Domain.Entities;
 using Ore.Domain.Enums;
+using Ore.Domain.ValueObjects;
 
 namespace Ore.Application.Features.Users.Commands;
+
+public sealed record BrandSurveyOnboardingInput(
+    string Voice,
+    string Tone,
+    string Audience,
+    string Goals,
+    string Competitors,
+    IEnumerable<string> Keywords);
 
 public sealed record RegisterUserCommand(
     string Email,
@@ -20,7 +30,8 @@ public sealed record RegisterUserCommand(
     string LastName,
     RoleType Role,
     string? TeamName,
-    bool IsIndividual) : IRequest<Result<Guid>>;
+    bool IsIndividual,
+    BrandSurveyOnboardingInput BrandSurvey) : IRequest<Result<Guid>>;
 
 public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCommand, Result<Guid>>
 {
@@ -69,6 +80,19 @@ public sealed class RegisterUserCommandHandler : IRequestHandler<RegisterUserCom
                 team = new Team(request.TeamName);
                 _dbContext.Teams.Add(team);
             }
+        }
+
+        if (team is not null && request.BrandSurvey is not null)
+        {
+            var profile = BrandVoiceProfile.Create(
+                request.BrandSurvey.Voice,
+                request.BrandSurvey.Tone,
+                request.BrandSurvey.Audience,
+                request.BrandSurvey.Goals,
+                request.BrandSurvey.Competitors,
+                request.BrandSurvey.Keywords ?? Array.Empty<string>());
+
+            team.SetBrandVoice(profile);
         }
 
         var identityId = await _identityService.CreateUserAsync(

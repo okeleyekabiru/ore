@@ -18,12 +18,18 @@ const navItems = [
     to: '/content/pipeline',
     description: 'Monitor generation → approval → scheduling flow.',
   },
+  {
+    label: 'Content Generator',
+    to: '/content/generate',
+    description: 'Spin up AI-assisted copy and creative direction.',
+  },
 ];
 
 const locationHints: Record<string, string> = {
   '/': 'Multi-channel performance snapshot and quick metrics.',
   '/onboarding/brand-survey': 'Guide new brands through tone, audience, and asset capture.',
   '/content/pipeline': 'Track ideation, approvals, and scheduled posts by channel.',
+  '/content/generate': 'Blend AI suggestions with your brand survey insights to unblock copywriting.',
 };
 
 const DashboardLayout = () => {

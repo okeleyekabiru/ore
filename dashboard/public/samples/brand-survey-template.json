@@ -2,6 +2,7 @@
   "teamId": "",
   "title": "Imported survey template",
   "description": "Customize this copy and upload it through the dashboard import flow.",
+  "category": "Onboarding",
   "questions": [
     {
       "prompt": "Who is your core audience?",

@@ -12,11 +12,13 @@ using Ore.Application.Abstractions.Identity;
 using Ore.Application.Common.Models;
 using Ore.Application.Features.BrandSurveys.Commands;
 using Ore.Application.Features.BrandSurveys.Queries;
+using Ore.Domain.Enums;
 
 namespace Ore.Api.Controllers;
 
 [Authorize]
 [Route("api/brand-surveys")]
+[Route("api/survey-template")]
 public sealed class BrandSurveysController : ApiControllerBase
 {
     private readonly ICurrentUserService _currentUserService;
@@ -28,6 +30,7 @@ public sealed class BrandSurveysController : ApiControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = nameof(RoleType.Admin))]
     public async Task<IActionResult> CreateSurvey(
         [FromBody] CreateBrandSurveyRequest request,
         CancellationToken cancellationToken)
@@ -36,6 +39,7 @@ public sealed class BrandSurveysController : ApiControllerBase
             request.TeamId,
             request.Title,
             request.Description,
+            request.Category,
             request.Questions.Select(q => new SurveyQuestionDto(q.Prompt, q.Type, q.Order, q.Options ?? [])));
 
         var result = await Mediator.Send(command, cancellationToken);
@@ -43,6 +47,7 @@ public sealed class BrandSurveysController : ApiControllerBase
     }
 
     [HttpPut("{surveyId:guid}")]
+    [Authorize(Roles = nameof(RoleType.Admin))]
     public async Task<IActionResult> UpdateSurvey(
         Guid surveyId,
         [FromBody] UpdateBrandSurveyRequest request,
@@ -52,6 +57,7 @@ public sealed class BrandSurveysController : ApiControllerBase
             surveyId,
             request.Title,
             request.Description,
+            request.Category,
             request.Questions.Select(q => new SurveyQuestionDto(q.Prompt, q.Type, q.Order, q.Options ?? [])));
 
         var result = await Mediator.Send(command, cancellationToken);
@@ -77,6 +83,7 @@ public sealed class BrandSurveysController : ApiControllerBase
                 s.TeamId,
                 s.Title,
                 s.Description,
+                s.Category,
                 s.IsActive,
                 s.QuestionCount,
                 s.CreatedOnUtc,
@@ -102,6 +109,7 @@ public sealed class BrandSurveysController : ApiControllerBase
             result.Value.TeamId,
             result.Value.Title,
             result.Value.Description,
+            result.Value.Category,
             result.Value.IsActive,
             [.. result.Value.Questions.Select(q => new BrandSurveyQuestionDetails(q.Id, q.Prompt, q.Type, q.Order, q.Options))]);
 
@@ -126,6 +134,8 @@ public sealed class BrandSurveysController : ApiControllerBase
                     request.VoiceProfile.Voice,
                     request.VoiceProfile.Tone,
                     request.VoiceProfile.Audience,
+                    request.VoiceProfile.Goals,
+                    request.VoiceProfile.Competitors,
                     request.VoiceProfile.Keywords ?? []));
 
         var result = await Mediator.Send(command, cancellationToken);
@@ -133,6 +143,7 @@ public sealed class BrandSurveysController : ApiControllerBase
     }
 
     [HttpPost("{surveyId:guid}/activate")]
+    [Authorize(Roles = nameof(RoleType.Admin))]
     public async Task<IActionResult> ActivateSurvey(Guid surveyId, CancellationToken cancellationToken)
     {
         var result = await Mediator.Send(new UpdateBrandSurveyStatusCommand(surveyId, true), cancellationToken);
@@ -140,6 +151,7 @@ public sealed class BrandSurveysController : ApiControllerBase
     }
 
     [HttpPost("{surveyId:guid}/deactivate")]
+    [Authorize(Roles = nameof(RoleType.Admin))]
     public async Task<IActionResult> DeactivateSurvey(Guid surveyId, CancellationToken cancellationToken)
     {
         var result = await Mediator.Send(new UpdateBrandSurveyStatusCommand(surveyId, false), cancellationToken);

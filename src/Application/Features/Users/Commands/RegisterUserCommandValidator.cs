@@ -27,5 +27,17 @@ public sealed class RegisterUserCommandValidator : AbstractValidator<RegisterUse
             .NotEmpty()
             .When(x => !x.IsIndividual)
             .WithMessage("Team name is required when registering as a team.");
+
+        RuleFor(x => x.BrandSurvey)
+            .NotNull();
+
+        When(x => x.BrandSurvey is not null, () =>
+        {
+            RuleFor(x => x.BrandSurvey!.Voice)
+                .NotEmpty();
+
+            RuleFor(x => x.BrandSurvey!.Tone)
+                .NotEmpty();
+        });
     }
 }
