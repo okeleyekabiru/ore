@@ -16,13 +16,13 @@ internal sealed class ContentItemConfiguration : IEntityTypeConfiguration<Conten
 
         builder.Property(ci => ci.Title)
             .IsRequired()
-            .HasMaxLength(200);
+            .HasMaxLength(2990);
 
         builder.Property(ci => ci.Body)
             .IsRequired();
 
         builder.Property(ci => ci.Caption)
-            .HasMaxLength(500);
+            .HasMaxLength(2990);
 
         builder.Property(ci => ci.Status)
             .HasConversion<int>();

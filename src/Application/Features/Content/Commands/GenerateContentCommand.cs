@@ -190,11 +190,12 @@ public sealed class GenerateContentCommandHandler : IRequestHandler<GenerateCont
         BrandVoiceProfile? voiceProfile,
         CancellationToken cancellationToken)
     {
-        var caption = generation.Caption.Trim();
+        var caption = generation.Caption?.Trim() ?? string.Empty;
+        var title = request.Topic.Trim();
         var hashtags = generation.Hashtags ?? Array.Empty<string>();
 
-        var contentItem = new ContentItem(request.TeamId, request.RequestedBy, request.Topic, caption, caption);
-        contentItem.UpdateContent(request.Topic, caption, caption, hashtags);
+        var contentItem = new ContentItem(request.TeamId, request.RequestedBy, title, caption, caption);
+        contentItem.UpdateContent(title, caption, caption, hashtags);
         contentItem.ApplyBrandVoice(voiceProfile);
         contentItem.MarkGenerated();
 
