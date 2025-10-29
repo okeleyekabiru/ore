@@ -11,9 +11,11 @@ using Ore.Application.Abstractions.Infrastructure;
 using Ore.Application.Abstractions.Llm;
 using Ore.Application.Abstractions.Messaging;
 using Ore.Application.Abstractions.Persistence;
+using Ore.Application.Abstractions.Publishing;
 using Ore.Application.Abstractions.Scheduling;
 using Ore.Application.Abstractions.Storage;
 using Ore.Infrastructure.Identity;
+using Ore.Infrastructure.Services.Publishing;
 using Ore.Infrastructure.Persistence;
 using Ore.Infrastructure.Options;
 using Ore.Infrastructure.Services.Auditing;
@@ -23,6 +25,7 @@ using Ore.Infrastructure.Services.Messaging;
 using Ore.Infrastructure.Services.Scheduling;
 using Ore.Infrastructure.Services.Storage;
 using Ore.Infrastructure.Services.Time;
+using Ore.Infrastructure.Middleware;
 using Quartz;
 using Serilog;
 using StackExchange.Redis;
@@ -83,6 +86,17 @@ public static class DependencyInjection
         services.AddScoped<INotificationService, NotificationService>();
         services.AddScoped<ISchedulingService, QuartzSchedulingService>();
         services.AddScoped<IAuditService, AuditService>();
+        services.AddScoped<IAuditContextProvider, AuditContextProvider>();
+
+        // Add social media publishing services
+        services.AddHttpClient<MetaPublisher>();
+        services.AddHttpClient<LinkedInPublisher>();
+        services.AddHttpClient<XPublisher>();
+        services.AddScoped<MetaPublisher>();
+        services.AddScoped<LinkedInPublisher>();
+        services.AddScoped<XPublisher>();
+        services.AddScoped<ISocialMediaPublisherFactory, SocialMediaPublisherFactory>();
+        services.AddScoped<IOAuthTokenService, OAuthTokenService>();
 
         services.AddQuartz();
         services.AddQuartzHostedService(options =>

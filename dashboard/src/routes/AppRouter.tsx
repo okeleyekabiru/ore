@@ -8,12 +8,19 @@ import ContentPipelinePage from '../pages/ContentPipeline/ContentPipelinePage';
 import ContentGenerationPage from '../pages/ContentGeneration/ContentGenerationPage';
 import NotFoundPage from '../pages/NotFound/NotFoundPage';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
-import RequireRole from '../components/auth/RequireRole';
 import LoginPage from '../pages/Auth/LoginPage';
 import SignUpPage from '../pages/Auth/SignUpPage';
-import { ROLE_TYPES } from '../types/auth';
 
 export const appRouter = createBrowserRouter([
+  {
+    path: '/login',
+    element: <LoginPage />,
+  },
+  {
+    path: '/register',
+    element: <SignUpPage />,
+  },
+  // Legacy auth routes for compatibility
   {
     path: '/auth/login',
     element: <LoginPage />,
@@ -35,24 +42,45 @@ export const appRouter = createBrowserRouter([
             element: <OverviewPage />,
           },
           {
+            path: 'dashboard',
+            element: <OverviewPage />,
+          },
+          {
+            path: 'surveys',
+            element: <BrandSurveyWizardPage />,
+          },
+          {
+            path: 'surveys/create',
+            element: <BrandSurveyCreatePage />,
+          },
+          {
+            path: 'surveys/import',
+            element: <BrandSurveyImportPage />,
+          },
+          {
+            path: 'content',
+            element: <ContentGenerationPage />,
+          },
+          {
+            path: 'approvals',
+            element: <ContentPipelinePage />, // Temporarily using existing page
+          },
+          {
+            path: 'scheduler',
+            element: <ContentPipelinePage />, // Temporarily using existing page
+          },
+          // Legacy routes for compatibility
+          {
             path: 'onboarding/brand-survey',
             element: <BrandSurveyWizardPage />,
           },
           {
             path: 'onboarding/brand-survey/create',
-            element: (
-              <RequireRole allowedRoles={[ROLE_TYPES.Admin]}>
-                <BrandSurveyCreatePage />
-              </RequireRole>
-            ),
+            element: <BrandSurveyCreatePage />,
           },
           {
             path: 'onboarding/brand-survey/import',
-            element: (
-              <RequireRole allowedRoles={[ROLE_TYPES.Admin]}>
-                <BrandSurveyImportPage />
-              </RequireRole>
-            ),
+            element: <BrandSurveyImportPage />,
           },
           {
             path: 'content/pipeline',

@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Ore.Application.Abstractions.Infrastructure;
 using Ore.Application.Abstractions.Messaging;
 using Ore.Application.Abstractions.Persistence;
 using Ore.Application.Common.Models;
@@ -18,11 +19,13 @@ public sealed class RejectContentCommandHandler : IRequestHandler<RejectContentC
 {
     private readonly IApplicationDbContext _dbContext;
     private readonly INotificationService _notificationService;
+    private readonly IAuditService _auditService;
 
-    public RejectContentCommandHandler(IApplicationDbContext dbContext, INotificationService notificationService)
+    public RejectContentCommandHandler(IApplicationDbContext dbContext, INotificationService notificationService, IAuditService auditService)
     {
         _dbContext = dbContext;
         _notificationService = notificationService;
+        _auditService = auditService;
     }
 
     public async Task<Result<Guid>> Handle(RejectContentCommand request, CancellationToken cancellationToken)
@@ -44,6 +47,19 @@ public sealed class RejectContentCommandHandler : IRequestHandler<RejectContentC
         _dbContext.ApprovalRecords.Add(approval);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        // Get approver info for audit log
+        var approver = await _dbContext.Users
+            .FirstOrDefaultAsync(u => u.Id == request.ApproverId, cancellationToken);
+
+        // Audit log the rejection
+        await _auditService.LogAsync(
+            approver?.FullName ?? "Unknown Approver",
+            "REJECT",
+            nameof(ContentItem),
+            content.Id.ToString(),
+            $"{{\"contentTitle\":\"{content.Title}\",\"reason\":\"{request.Reason}\",\"approverId\":\"{request.ApproverId}\"}}",
+            cancellationToken);
 
         if (content.AuthorId.HasValue)
         {

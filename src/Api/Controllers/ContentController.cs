@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using MediatR;
@@ -9,6 +10,7 @@ using Ore.Api.Contracts.Content;
 using Ore.Application.Abstractions.Identity;
 using Ore.Application.Common.Models;
 using Ore.Application.Features.Content.Commands;
+using Ore.Application.Features.Content.Queries;
 using Ore.Domain.Enums;
 
 namespace Ore.Api.Controllers;
@@ -56,5 +58,76 @@ public sealed class ContentController : ApiControllerBase
             result.Value.ImageIdea);
 
         return FromResult(Result<GenerateContentResponse>.Success(response), "Content suggestion generated.");
+    }
+
+    [HttpPost("submit")]
+    public async Task<IActionResult> Submit(
+        [FromBody] SubmitContentRequest request,
+        CancellationToken cancellationToken)
+    {
+        var actorId = _currentUserService.GetUserId();
+
+        var command = new SubmitContentForApprovalCommand(request.ContentId, actorId);
+        var result = await Mediator.Send(command, cancellationToken);
+
+        if (!result.Succeeded)
+        {
+            return FromResult(Result<Guid>.Failure([.. result.Errors]));
+        }
+
+        return FromResult(Result<Guid>.Success(result.Value), "Content submitted for approval.");
+    }
+
+    [HttpPost("approve")]
+    public async Task<IActionResult> Approve(
+        [FromBody] ApproveContentRequest request,
+        CancellationToken cancellationToken)
+    {
+        var actorId = _currentUserService.GetUserId();
+
+        var command = new ApproveContentCommand(request.ContentId, actorId, request.Comments);
+        var result = await Mediator.Send(command, cancellationToken);
+
+        if (!result.Succeeded)
+        {
+            return FromResult(Result<Guid>.Failure([.. result.Errors]));
+        }
+
+        return FromResult(Result<Guid>.Success(result.Value), "Content approved successfully.");
+    }
+
+    [HttpGet("pending")]
+    public async Task<IActionResult> GetPending(
+        [FromQuery] Guid teamId,
+        CancellationToken cancellationToken)
+    {
+        if (teamId == Guid.Empty)
+        {
+            return FromResult(Result<PendingContentResponse[]>.Failure("Team ID is required."));
+        }
+
+        var query = new GetPendingContentQuery(teamId);
+        var result = await Mediator.Send(query, cancellationToken);
+
+        if (!result.Succeeded || result.Value is null)
+        {
+            return FromResult(Result<PendingContentResponse[]>.Failure([.. result.Errors]));
+        }
+
+        var response = result.Value.Select(dto => new PendingContentResponse(
+            dto.Id,
+            dto.Title,
+            dto.Body,
+            dto.Caption,
+            dto.Hashtags,
+            dto.SubmittedOnUtc,
+            new PendingContentAuthorResponse(
+                dto.Author.Id,
+                dto.Author.Name,
+                dto.Author.Email
+            )
+        )).ToArray();
+
+        return FromResult(Result<PendingContentResponse[]>.Success(response), "Pending content retrieved.");
     }
 }

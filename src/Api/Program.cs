@@ -5,12 +5,15 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Ore.Api.Common.Filters;
 using Ore.Api.Common.Responses;
+using Ore.Api.Hubs;
 using Ore.Api.Services;
 using Ore.Api.Validators.Auth;
+using Ore.Application.Abstractions.Infrastructure;
 using Ore.Application;
 using Ore.Application.Abstractions.Identity;
 using Ore.Infrastructure;
 using Ore.Infrastructure.Identity;
+using Ore.Infrastructure.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +22,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+builder.Services.AddScoped<INotificationHubService, NotificationHubService>();
 builder.Services.AddScoped<ApiExceptionFilterAttribute>();
 
 builder.Services.AddControllers(options =>
@@ -27,12 +31,14 @@ builder.Services.AddControllers(options =>
 });
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSignalR();
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("http://localhost:5173", "http://localhost:3000") // React dev server
             .AllowAnyHeader()
-            .AllowAnyMethod());
+            .AllowAnyMethod()
+            .AllowCredentials());
 });
 
 builder.Services.AddProblemDetails();
@@ -70,9 +76,11 @@ app.UseHttpsRedirection();
 app.UseCors();
 
 app.UseAuthentication();
+app.UseMiddleware<AuditContextMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<NotificationHub>("/hubs/notifications");
 app.MapHealthChecks("/health");
 
 await app.RunAsync();

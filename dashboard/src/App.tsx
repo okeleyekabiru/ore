@@ -1,12 +1,22 @@
+import { Provider } from 'react-redux';
 import { RouterProvider } from 'react-router-dom';
+import { store } from './store';
 import { appRouter } from './routes/AppRouter';
-import { AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider } from './components/providers/ThemeProvider';
+import { NotificationProvider } from './components/providers/NotificationProvider';
+import { SignalRProvider } from './components/providers/SignalRProvider';
 
 const App = () => {
   return (
-    <AuthProvider>
-      <RouterProvider router={appRouter} />
-    </AuthProvider>
+    <Provider store={store}>
+      <ThemeProvider>
+        <SignalRProvider>
+          <NotificationProvider>
+            <RouterProvider router={appRouter} />
+          </NotificationProvider>
+        </SignalRProvider>
+      </ThemeProvider>
+    </Provider>
   );
 };
 

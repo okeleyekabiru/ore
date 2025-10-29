@@ -8,13 +8,15 @@ public sealed class AuditLog : AuditableEntity, IAggregateRoot
     {
     }
 
-    public AuditLog(string actor, string action, string entity, string entityId, string metadata)
+    public AuditLog(string actor, string action, string entity, string entityId, string metadata, string? userId = null, string? ipAddress = null)
     {
         Actor = actor;
         Action = action;
         Entity = entity;
         EntityId = entityId;
         Metadata = metadata;
+        UserId = userId;
+        IPAddress = ipAddress;
     }
 
     public string Actor { get; private set; } = string.Empty;
@@ -22,4 +24,6 @@ public sealed class AuditLog : AuditableEntity, IAggregateRoot
     public string Entity { get; private set; } = string.Empty;
     public string EntityId { get; private set; } = string.Empty;
     public string Metadata { get; private set; } = string.Empty;
+    public string? UserId { get; private set; }
+    public string? IPAddress { get; private set; }
 }
